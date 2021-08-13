@@ -1,0 +1,179 @@
+﻿@using Attanaya_Warrior_Institute.Models
+@using Microsoft.AspNet.Identity
+@model Attanaya_Warrior_Institute.Models.EduClassViewModel
+ 
+<link href="~/Content/Dashboard.css" rel="stylesheet" />
+
+@{
+    ViewBag.Title = "Dashboard";
+
+    Instructor instructor = Instructor.GetInstructorFromAccountId(Guid.Parse(User.Identity.GetUserId()));
+    var IsInstructor = instructor.AccountID == Guid.Empty ? false : true;
+
+    SubscriptionModel Sub = SubscriptionModel.GetSubscriptionByAccountID(Guid.Parse(User.Identity.GetUserId()));
+    var IsSubscriber = Sub.RecordID == Guid.Empty ? false : true;
+
+    List<MembershipPlansModel> memberships = MembershipPlansModel.GetAllMembershipPlans();
+    IEnumerable<Rooms> RoomsList = Rooms.GetAvailableRooms();
+
+}
+    <div style="margin-top: 100px;">
+        <div class="
+             d-lg-inline-block
+             d-md-inline-block
+             d-sm-inline-block">
+
+            <div class="
+             col-lg-4
+             d-lg-block
+             col-md-4
+             d-md-block
+             col-sm-12
+             d-sm-block
+             float-left">
+
+                <div class="fa-2x special-elite-font font-weight-bolder text-white pl-1" style="background-color: maroon">AWI Member Dashboard</div>
+
+                <div class="bg-dark text-white p-1">
+
+                    <div>Welcome, @(IsInstructor ? instructor.InstructorCompanyName : User.Identity.GetUserName()) </div>
+
+                    @if (IsInstructor)
+                    {
+                        <div class="small mb-3">You've been an Instructor Partner since @instructor.AgreementStartDate!</div>
+
+                    }
+
+                    @if (IsSubscriber)
+                    {
+                        <div class="small mb-3">You've been a member since @Sub.SubscriptionStartDate! Your subscription:  @memberships.Where(m => m.PayPalPlanId.Equals(Sub.SubscriptionType)).Single().PlanName  </div>
+                    }
+
+                    @if (IsInstructor)
+                    {
+                        <div class="mb-2">You are currently enrolled in our @instructor.PartnershipPercentage% partnership program.</div>
+                        <div>Your instructor discount code is <strong>"@instructor.DiscountCode"</strong>, and is worth @Utility.GetDiscounts(instructor.DiscountCode).DiscountPercentage% off! </div>
+                    }
+
+                    <div class="m-3 bg-light">
+                        <div class="mb-1 text-black-50">What You Can Do:</div>
+                        <ul>
+                            <li style="color: green">@Html.ActionLink("Manage Account Information", "Index", "Manage")</li>
+
+                            @if (IsInstructor)
+                            {
+                                <li style="color: green">@Html.ActionLink("Create a new class", "ManageClasses", "Home")</li>
+                            }
+
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="
+             col-lg-8
+             d-lg-block
+             col-md-8
+             d-md-block
+             col-sm-12
+             d-sm-block
+             float-right">
+
+                @if (IsInstructor)
+                {
+                <div class="fa-2x special-elite-font font-weight-bolder text-white pl-2" style="background-color: navy">Your Classes To Instruct:</div>
+                }
+                
+            <div class="bg-light">
+                @if (IsInstructor) // Instructor Lists
+                {
+
+                    if (Model.EduClasses.Any()) // Get classes to be taught
+                    {
+                        foreach (var cls in Model.EduClasses.Where(eduClass => eduClass.StartDateTime > DateTime.Now))
+                        {
+                            <div class="d-none" id="InstructorId">@cls.InstructorId</div>
+                            <div class="class-block-header">@cls.ClassTitle</div>
+                            <div class="class-block-body">
+                                <div class="class-block-description">
+                                    <div class="class-subtitle"><strong>Description:</strong></div>
+                                    <div>@cls.Description</div>
+                                    <div class="class-subtitle"><strong>When:</strong></div>
+                                    <div>@cls.StartDateTime.ToShortDateString(), @cls.StartDateTime.ToShortTimeString() until @cls.EndDateTime.ToShortTimeString()</div>
+                                    <div class="class-subtitle"><strong>Where:</strong></div>
+                                    <div>@RoomsList.Where(r => r.ID.Equals(cls.MainRoom)).Single().Name  @(cls.SecondaryRoom != 0 && cls.SecondaryRoom != 7 ? string.Format(" & " + RoomsList.Where(r => r.ID.Equals(cls.SecondaryRoom)).Single().Name) : string.Empty)</div>
+                                    <div class="class-subtitle"><strong>Attendees:</strong></div>
+                                    <div>@StudentBookings.GetAllStudentBookingsForEduClassID(cls.EduClassId).Count / @cls.MaxAttendees</div>
+                                    <div class="class-subtitle"><strong>Cost:</strong></div>
+                                    <div>$@cls.CostPerStudent</div>
+                                    <div class="class-subtitle"><strong>Uses External Booking?</strong></div>
+                                    <div>@cls.ExternalBookingSource</div>
+
+                                    <div class="text-right mr-3">
+                                        @Html.ActionLink("EDIT CLASS", "EditClasses", new { cls.EduClassId }, new { @class = "btn btn-primary pull-right" });
+                                    </div>
+                                </div>
+                                <hr />
+                            </div>
+                        }
+                    }
+                    else // else say no classes are scheduled...
+                    {
+                        <div> No classes scheduled to be taught at this time! Schedule some classes!</div>
+                    }
+
+                    if (true)// And classes to be attended
+                    {
+                        <div class="fa-2x special-elite-font font-weight-bolder text-white pl-2 mt-3" style="background-color: navy">Your Classes To Learn:</div>
+
+                        <div> <strong>THIS FEATURE IS UNDER DEVELOPMENT</strong> Check back soon! </div> // ToDo:
+
+                        @*<div> <strong> No classes scheduled to be attended at this time!</strong> Schedule a class and improve your capabilities! </div> // ToDo:*@
+                    }
+
+                }
+                else  // Student Lists
+                {
+                    <div class="fa-2x special-elite-font font-weight-bolder text-white pl-2 mt-3" style="background-color: navy">Your Classes To Learn:</div>
+
+
+                    if (Model.EduClasses.Any()) // Get classes to be learned
+                    {
+                        foreach (var cls in Model.EduClasses.Where(eduClass => eduClass.StartDateTime > DateTime.Now))
+                        {
+                            <div class="d-none" id="InstructorId">@cls.InstructorId</div>
+                            <div class="class-block-header">@cls.ClassTitle</div>
+                            <div class="class-block-body">
+                                <div class="class-block-description">
+                                    <div class="class-subtitle"><strong>Description:</strong></div>
+                                    <div>@cls.Description</div>
+                                    <div class="class-subtitle"><strong>When:</strong></div>
+                                    <div>@cls.StartDateTime.ToShortDateString(), @cls.StartDateTime.ToShortTimeString() until @cls.EndDateTime.ToShortTimeString()</div>
+                                    <div class="class-subtitle"><strong>Where:</strong></div>
+                                    <div>@RoomsList.Where(r => r.ID.Equals(cls.MainRoom)).Single().Name @(cls.SecondaryRoom != 0 && cls.SecondaryRoom != 7 ? string.Format(" & " + RoomsList.Where(r => r.ID.Equals(cls.SecondaryRoom)).Single().Name) : string.Empty) </div>
+                                    <div class="class-subtitle"><strong>Max Attendees:</strong></div>
+                                    <div>@cls.MaxAttendees</div>
+                                    <div class="class-subtitle"><strong>Cost:</strong></div>
+                                    <div>$@cls.CostPerStudent</div>
+                                    <div class="class-subtitle"><strong>Uses External Booking?</strong></div>
+                                    <div>@cls.ExternalBookingSource</div>
+                                </div>
+                                <hr />
+                            </div>
+                        }
+                    }
+                    else // else say no classes are scheduled...
+                    {
+                        <div> No classes scheduled to be taught at this time! Schedule some classes!</div>
+                    }
+
+
+                    @*<div> <strong> No classes scheduled to be attended at this time!</strong> Schedule a class and improve your capabilities! </div> // ToDo:*@
+
+                    // Just get classes to be attended.
+                }
+            </div>
+
+            </div>
+        </div>
+    </div>

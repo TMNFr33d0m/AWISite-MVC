@@ -1,0 +1,11 @@
+﻿body {
+}
+
+.hourly-result {
+    max-width: 15vw;
+}
+
+address {
+    display: block;
+    font-style: italic;
+}

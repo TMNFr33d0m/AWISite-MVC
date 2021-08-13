@@ -1,0 +1,163 @@
+﻿@using Attanaya_Warrior_Institute.Models
+@using Microsoft.AspNet.Identity
+@model Attanaya_Warrior_Institute.Models.ClassBookingViewModel
+
+@{
+    ViewBag.Title = "ClassBooking";
+    IEnumerable<Rooms> RoomsList = Rooms.GetAvailableRooms();
+}
+
+<div class="mt-2 forum-font">
+    <h2 class="special-elite-font">Book The Class...</h2>
+
+    <div class="mb-2">
+        <h3 class="special-elite-font">Student Information:</h3>
+
+        @Html.HiddenFor(n => n.EduClass.EduClassId, new { @id = "EduClassId" })
+        @Html.HiddenFor(n => n.Student.StudentID, new { @id = "StudentId" })
+        @Html.HiddenFor(m => m.EduClass.CostPerStudent, new { @id = "TotalMoney", @readonly = "readonly" })
+        @Html.HiddenFor(m => m.EduClass.StartDateTime, new { @id = "classTimeStart" })
+        @Html.HiddenFor(m => m.EduClass.EndDateTime, new { @id = "classTimeEnd" })
+
+        <div class="mb-1">
+            <div class="font-weight-bold" id="firstNameTitle">Name: </div>
+            <div id="firstName" style="font-size: large">@Model.Student.FirstName @Model.Student.MiddleName @Model.Student.LastName</div>
+        </div>
+
+        <div class="mb-1">
+            <div class="font-weight-bold" id="emailAddressTitle">Email Address: </div>
+            <div id="emailAddress" style="font-size: large">@Model.Student.EmailAddress</div>
+        </div>
+
+        <div class="mb-3">
+            <div class="font-weight-bold" id="phoneNumberTitle">Phone Number: </div>
+            <div id="phoneNumber" style="font-size: large">@Model.Student.PhoneNumber</div>
+        </div>
+    </div>
+
+    <div class="mb-2">
+        <h3 class="special-elite-font mb-2"> Class Information</h3>
+
+        <div class="mb-3">
+            <div class="font-weight-bold" id="classTitleTitle">Class: </div>
+            <div id="classTitle">@Model.EduClass.ClassTitle</div>
+        </div>
+
+        <div class="mb-1">
+            <div class="font-weight-bold" id="descriptionTitle">Description: </div>
+            <div id="description">@Model.EduClass.Description</div>
+        </div>
+
+        <div class="mb-1">
+            <div class="font-weight-bold">Class Time: </div>
+            <div id="classTimeText">@Model.EduClass.StartDateTime - @Model.EduClass.EndDateTime</div>
+        </div>
+    </div>
+
+    <div class="mb-1">
+        <div class="font-weight-bold">Classroom: </div>
+        <div id="classRoom">@RoomsList.Where(r => r.ID.Equals(Model.EduClass.MainRoom)).Single().Name.Trim() </div>
+        <div id="classRoomId" class="d-none" hidden>@RoomsList.Where(r => r.ID.Equals(Model.EduClass.MainRoom)).Single().ID.ToString()</div>
+    </div>
+
+    <div class="mb-1">
+        <div class="font-weight-bold">Alternate Room:</div>
+        <div id="classRoomAlt">@RoomsList.Where(r => r.ID.Equals(Model.EduClass.SecondaryRoom)).Single().Name.Trim()</div>
+        <div id="classRoomAltId" class="d-none" hidden>@RoomsList.Where(r => r.ID.Equals(Model.EduClass.SecondaryRoom)).Single().ID.ToString()</div>
+    </div>
+
+    <div class="mb-3">
+        <div class="font-weight-bold"> Maximum Attendees:</div>
+        <div id="maxAttendees">@Model.EduClass.MaxAttendees</div>
+    </div>
+
+    <div class="mb-1">
+        <div class="font-weight-bold">Cost:</div>
+        $@Model.EduClass.CostPerStudent
+    </div>
+</div>
+
+@if (Model.EduClass.CostPerStudent == 0)
+{
+
+    <div class="btn btn-success" onclick="saveStudentBooking()">Enroll Now! (Free Class!)</div>
+}
+else
+{
+    <div id="paypal-button-container"> <h3 class="special-elite-font" style="padding-top: 10px; padding-bottom: 20px">Payment Information:</h3></div>
+
+}
+
+@*<div class="btn btn-primary" onclick="saveStudentBooking()"> Test Booking</div>*@
+
+<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+
+
+@*// Live SDK Client ID*@
+<!-- --> 
+<script src="https://www.paypal.com/sdk/js?client-id=AVIstvNQ4gyLkuLXXefuqfQt5VHvtVu-WB6Govz2nyqUT1L7TB-Tsku5AOhp5yoEc1jtgHHgXugh-xHw&vault=true" data-sdk-integration-source="button-factory"></script> <!--  -->
+@*// Test SDK Client ID*@
+<!--
+<script src="https://www.paypal.com/sdk/js?client-id=ARwobHGwHMq6jQHcosnImEfNAqNi-uc9hyQBsHx_lYnTvzxsxzIgzbhE94nb013Dfv1E5CKpJGfumOIo&vault=true" data-sdk-integration-source="button-factory"></script><!-- -->
+<script src="~/Scripts/classbooking.js"></script>
+
+<script>
+    // Render the PayPal button into #paypal-button-container
+    paypal.Buttons({
+
+        // Set up the transaction
+        createOrder: function (data, actions) {
+            return actions.order.create({
+                purchase_units: [{
+                    amount: {
+                        value: $('#TotalMoney').val().toString()
+                    },
+                    application_context: {
+                        shipping_preference: 'NO_SHIPPING'
+                    }
+                }]
+            });
+        },
+
+        // Finalize the transaction
+        onApprove: function (data, actions) {
+            return actions.order.capture().then(function (details) {
+                saveStudentBooking();
+            });
+        }
+
+    }).render('#paypal-button-container');
+
+     function saveStudentBooking() {
+
+            $.ajax({
+                url: '@Url.Action("SaveStudentBooking", "Home")',
+                data: {
+                    "EduClassId": $('#EduClassId').val(),
+                    "StudentId": $('#StudentId').val(),
+                    "firstName": $("#firstName").text(),
+                    "middleName": $("#middleName").text(),
+                    "lastName": $("#lastName").text(),
+                    "emailAddress": $('#emailAddress').text(),
+                    "phoneNumber": $('#phoneNumber').text(),
+                    "classTitle": $('#classTitle').text(),
+                    "classTimeStart": $('#classTimeStart').val(),
+                    "classTimeEnd": $('#classTimeEnd').val(),
+                    "classRoom": $('#classRoomId').text(),
+                    "classRoomAlt": $('#classRoomAltId').text(),
+                    "maxAttendees": $('#maxAttendees').text(),
+                    "totalMoney":$('#TotalMoney').val()
+                },
+                cache: false,
+                type: "GET",
+                success: function () {
+                    createReceipt('@Url.Action("ClassBookingReceipt", "Home")');
+                },
+                error: function (response) {
+
+                }
+            });
+    }
+
+</script>

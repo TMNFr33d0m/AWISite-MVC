@@ -1,0 +1,133 @@
+﻿@model Attanaya_Warrior_Institute.Models.WaiverClass
+
+
+@{
+    ViewBag.Title = "Waiver";
+}
+
+<link href="~/Content/waiver.css" rel="stylesheet" />
+
+<div class="background-image-container">
+    <div class="waiver-title special-elite-font">
+        Attanaya Warrior Institute - PARTICIPANT CHECK IN!
+    </div>
+
+    <div class="waiver-body forum-font">
+
+        <div class="waiver-text"> Welcome to Attanaya Warrior Institute! Your experience is just about to begin! First, we need to cover a few legal things...</div>
+
+        <h4>Waiver and Release of Liability</h4>
+
+        <div class="waiver-text"> In consideration of Attanaya Warrior Institute furnishing services and/or equipment to enable me to participate in firearms related training, I agree as follows:</div>
+
+        <div class="waiver-text">
+            I fully understand and acknowledge that; (a) risks and dangers exist in my use of gas or electric operated infrared laser emitting and my participation in firearms related activities; (b) my participation in such activities and/or use of such equipment my result in my injury or illness including but not limited to bodily injury, disease strains, fractures, total or partial paralysis, eye injury,
+            blindness or heat stroke, heart attack, or death or other ailments that could cause serious disability; These risks and dangers may be caused by the negligence of others, employees, officers or agents of Attanaya Warrior Institute or Instructor Partners, the negligence of the participants, the negligence of others, accidents, breeches of contract, the forces of nature or other causes.
+            These risks and dangers may arise from foreseeable or unforeseeable causes; and (d) by my participation in these activities and or/use of equipment, I hereby assume all risks and dangers and all responsibility for any losses and/or damages, whether caused in whole or in part by the negligence or conduct of the owners, agents, officers, employees of Attanaya Warrior Institute or by any other person.
+        </div>
+        <div class="waiver-text">
+            I, on behalf of myself, my personal representatives and my heirs, hereby voluntarily agree to release waive, discharge, hold harmless, defend and indemnify Attanaya Warrior Institute and it’s owners, agents, officers and employees from any and all claims, actions or losses for bodily injury, property damage, wrongful death, loss of services or otherwise, which may arise out of my use of
+            gas or electric operated infrared laser emitting equipment or my participation in firearms training activities. I specifically understand that I am releasing, discharging and waiving any claims or actions that I may have presently or in the future for the negligent acts or other conduct by the owners, agents, officers or employees of Attanaya Warrior Institute.
+        </div>
+
+        <h4>Physical Contact in Firearms Instruction</h4>
+
+        <div class="waiver-text">
+            The practice of firearms instruction requires some physical contact between instructor and student. The following diagram shows which “touch zones” are considered acceptable for firearms instruction.
+            These touch zones apply to all genders. Physical contact in acceptable touch zones for the express purpose of firearms instruction is not considered sexual in nature and shall not be construed as sexual harassment or a violation of any form.
+            “Acceptable” touch zones are: Green zones as needed, and yellow zones for short durations.
+        </div>
+
+        <img class="touch-zone-graphic mb-3" src="~/Images/TouchZones.png" />
+
+        <div class="waiver-text font-weight-bold">EMERGENCY CONTACT: In the event of an emergency, please contact the following person(s):</div>
+
+        <div>
+            Emergency Contact Name: @Html.TextBoxFor(i => i.EContactName, new { @class = "form-control", @type = "text" })
+            Emergency Contact Phone Number:  @Html.TextBoxFor(i => i.EContactPhone, new { @class = "form-control", @type = "tel" })
+            Emergency Contact Relationship: @Html.TextBoxFor(i => i.EContactRelationship, new { @class = "form-control", @type = "text" })
+        </div>
+
+        <div class="waiver-text mt-3">
+            I, THE UNDERSIGNED PARTICIPANT, AFFIRM THAT I AM OF THE AGE OF 18 YEARS OR OLDER, AND THAT I AM FREELY SIGNING THIS AGREEMENT. I CERTIFY THAT I HAVE READ THIS AGREEMENT, THAT I FULLY UNDERSTAND ITS CONTENT AND THAT THIS RELEASE CANNOT BE MODIFIED ORALLY. I AM AWARE THAT THIS IS A RELEASE OF LIABILITY AND A CONTRACT AND THAT I AM SIGNING IT OF MY OWN FREE WILL.
+        </div>
+
+        <div class="waiver-text">
+            Participant's Name: @Html.TextBoxFor(i => i.ParticipantName, new { @class = "form-control", @type = "text" })
+            Participant's Email: @Html.TextBoxFor(i => i.ParticipantEmail, new { @class = "form-control", @type = "email" })
+            Participant's Phone:  @Html.TextBoxFor(i => i.ParticipantPhone, new { @class = "form-control", @type = "tel" })
+        </div>
+
+        <div class="waiver-subtitle">PARENT / GUARDIAN WAIVER FOR MINORS</div>
+
+        <div class="waiver-text">
+            In the event that the participant is under the age of consent (18 years of age), then this release
+            must be signed by a parent or guardian, as follows:
+        </div>
+
+        <div class="waiver-text">
+            I HEREBY CERTIFY that I am the parent or guardian of person named above, and do hereby give my
+            consent without reservation to the foregoing on behalf of this individual.
+        </div>
+
+        <div class="waiver-text">
+            Parent / Guardian Name: @Html.TextBoxFor(i => i.ParentGuradian, new { @class = "form-control", @type = "text" })
+            Relationship to Minor: @Html.TextBoxFor(i => i.ParentGuardianRelationship, new { @class = "form-control", @type = "text" })
+        </div>
+
+        <div class="btn btn-outline-success" type="submit" onclick="saveWaiverToDb()"> I AGREE</div>
+        <small id="emailHelp" class="form-text text-muted">Clicking 'I AGREE' is the legal equivalent of a signature. </small>
+        <div id="validation-message" style="color: red"></div>
+    </div>
+</div>
+<script src="~/Scripts/waiver.js"></script>
+
+<script>
+
+    function saveWaiverToDb() {
+
+        if (ValildateWaiver()) {
+
+            var dataVals = {
+                'ParticipantName': $("#ParticipantName").val(),
+                'ParticipantPhone': $("#ParticipantPhone").val(),
+                'ParticipantEmail': $("#ParticipantEmail").val(),
+                'EContactName': $("#EContactName").val(),
+                'EContactPhone': $("#EContactPhone").val(),
+                'EContactRelationship': $("#EContactRelationship").val(),
+                'SignatureDate': $("#SignatureDate").val(),
+                'ParentGuradian': $("#ParentGuradian").val(),
+                'ParentGuardianRelationship': $("#ParentGuardianRelationship").val()
+            };
+
+            $.ajax({
+                url: '@Url.Action("SaveWaiver", "Home")',
+                cache: false,
+                type: "POST",
+                data: dataVals,
+                success: function (response) {
+                    alert('Your waiver has been submitted. Thank you! The form will now clear and reset for the next person. You may now begin your experience!');
+                    clearWaiver();
+                },
+                error: function (xhr) {
+                    alert('There was a problem and the waiver was NOT submitted. Please ask the person at the counter for assistance.');
+                }
+            });
+        }
+    }
+
+    function clearWaiver() {
+
+        $("#ParticipantName").val('');
+        $("#ParticipantPhone").val('');
+        $("#ParticipantEmail").val('');
+        $("#EContactName").val('');
+        $("#EContactPhone").val('');
+        $("#EContactRelationship").val('');
+        $("#ParentGuradian").val('');
+        $("#ParentGuardianRelationship").val('');
+        $("#validation-message").text('');
+        $("html, body").animate({ scrollTop: 0 }, "slow");
+    }
+
+</script>

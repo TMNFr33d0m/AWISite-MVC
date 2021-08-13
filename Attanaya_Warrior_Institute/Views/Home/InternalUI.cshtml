@@ -1,0 +1,74 @@
+﻿@using Attanaya_Warrior_Institute.Models
+@using Microsoft.AspNet.Identity
+@using System.Web.Script.Serialization;
+@using System.Configuration;
+@model Attanaya_Warrior_Institute.Models.DashboardViewModel
+
+
+<link href="~/Content/InternalUI.css" rel="stylesheet" />
+
+@{
+    ViewBag.Title = "Internal UI";
+
+    List<MembershipPlansModel> memberships = MembershipPlansModel.GetAllMembershipPlans();
+
+}
+
+<div class="body-content" style="margin-top: 100px">
+    <div class="row">
+        <div class="internal-ui-menu col-3 float-left bg-dark" style="min-height: 325px">
+
+            <div class="pt-3 p-2">
+                <div class="text-white mb-2"><a class="btn btn-outline-success mr-2" href="https://www.paypal.com/virtualterminal/launch?source=hawk" target="_blank">Quick Charge</a>Manually Process A CC Payment</div>
+                <div class="text-white"><a class="btn btn-outline-success mr-2" href="https://app.connecteam.com/index.html#/Login" target="_blank">ConnectTeam</a>ConnectTeam Launch Pad</div>
+                @*<div class="m-2">
+                        <div id="Custom" class="btn btn-sm btn-success m-1" onclick="setOneHourSim1();">Set Sim 1 One Hour</div>
+                        <div id="Custom" class="btn btn-sm btn-success m-1" onclick="setOneHourSim2();">Set Sim 2 One Hour</div>
+                        <div id="Custom" class="btn btn-sm btn-success m-1" onclick="setOneHourSimC();">Set Sim C One Hour</div>
+
+                        <div id="Custom" class="btn btn-sm btn-success m-1" onclick="setOneHourSim1(); setOneHourSim2(); setOneHourSimC();">Set ALL to one hour </div>
+
+                        <div id="Custom" class="btn btn-sm btn-success m-1" onclick="SetTwoHoursSim1();">Set Sim 1 Two Hours</div>
+                        <div id="Custom" class="btn btn-sm btn-success m-1" onclick="SetTwoHoursSim2();">Set Sim 2 Two Hours</div>
+                        <div id="Custom" class="btn btn-sm btn-success m-1" onclick="SetTwoHoursSimC();">Set Sim C Two Hours</div>
+
+                        <div id="Custom" class="btn btn-sm btn-success m-1" onclick="SetThreeHoursSim1();">Set Sim 1 Three Hours</div>
+                        <div id="Custom" class="btn btn-sm btn-success m-1" onclick="SetThreeHoursSim2();">Set Sim 2 Three Hours</div>
+                        <div id="Custom" class="btn btn-sm btn-success m-1" onclick="SetThreeHoursSimC();">Set Sim C Three Hours</div>
+
+                        <div id="Custom" class="btn btn-sm btn-success m-1" onclick="SetFourHoursSim1();">Set Sim 1 Four Hours</div>
+                        <div id="Custom" class="btn btn-sm btn-success m-1" onclick="SetThreeHoursSim2();">Set Sim 2 Four Hours</div>
+                        <div id="Custom" class="btn btn-sm btn-success m-1" onclick="SetThreeHoursSimC();">Set Sim C Four Hours</div>
+
+                    </div>*@
+            </div>
+        </div>
+
+        <div id="appointments" class="upcoming-appointments-ui col-9 float-right">
+
+            @Html.Partial("InternalUISchedulePartial", Model)
+
+        </div>
+
+    </div>
+</div>
+
+<script src="~/Scripts/jquery-3.4.1.js"></script>
+<script src="~/Scripts/internalui.js"></script>
+
+<script>
+
+    window.onload = function () {
+        setInterval('updateUI()', @ConfigurationManager.AppSettings["InternalUIRefreshTimerInterval"]);
+    };
+
+    function updateUI() {
+
+        var url = "@Url.Action("InternalUISchedulePartial", "Home")";
+        
+        $.post(url, null, function(res){
+            $("#appointments").html(res);
+            });
+    }
+
+</script>

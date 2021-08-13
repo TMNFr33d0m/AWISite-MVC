@@ -1,0 +1,64 @@
+﻿@using Attanaya_Warrior_Institute.Models
+@using Microsoft.AspNet.Identity
+@model Attanaya_Warrior_Institute.Models.DashboardViewModel
+
+<div class="upcoming-appointments-ui" >
+
+    <h3 class="special-elite-font mt-2"> @Utility.GetCurrentTucsonTime().ToShortDateString() Schedule:</h3>
+
+    @{ var TodaysBookings = Model.EBookings.Where(r => r.ReservationDate.Day == Utility.GetCurrentTucsonTime().Day && r.ReservationDate.Month == Utility.GetCurrentTucsonTime().Month && r.ReservationDate.Year == DateTime.Now.Year);}
+
+    @foreach (var bRecord in TodaysBookings)
+    {
+
+        if (bRecord.Type == "Experience")
+        {
+
+            var res = Reservation.GetReservationByReservationId(bRecord.RecordID);
+            Experience Exp = Experience.GetExperienceByID(res.DesiredExperience);
+
+            <div class="card mb-1">
+                <div class="card-body">
+                    <div class="small"> @DateTime.Parse(res.ReservationDate).ToShortDateString()</div>
+                    <div class="card-title bg-light pl-2 font-weight-bolder">Reservation For:  @res.ReservationName @(res.ReservationGuestCount > 0 ? "and " + (res.ReservationGuestCount - 1) + " additional guests." : "")</div>
+                    <div class="small mb-2">Reservation ID: @bRecord.RecordID</div>
+                    <div class="card-text">Starting at @bRecord.ReservationTime and continuing until @bRecord.ReservationTime.Add(new TimeSpan(0, bRecord.ReservationDurationHrs, 0, 0)) (@bRecord.ReservationDurationHrs hours)</div>
+                    <div class="card-text">Room: @Model.Rooms.Where(r => r.ID.Equals(bRecord.SelectedReservationRoom)).Single().Name </div>
+                    <div class="card-text">Experience: @Exp.ExperienceTitle</div>
+                    <div class="btn btn-dark float-lg-right mr-2">Modify</div>
+                    <div class="btn btn-dark float-lg-right mr-2" onclick="SetRoomToTime(@bRecord.SelectedReservationRoom,@bRecord.ReservationDurationHrs)">Check In</div>
+                </div>
+            </div>
+        }
+
+        if (bRecord.Type == "Class" && bRecord.ReservationDate.Day == Utility.GetCurrentTucsonTime().Day)
+        {
+            var cls = EduClass.GetEduClassById(bRecord.RecordID);
+
+            <div class="card mb-1">
+                <div class="card-body">
+                    <div class="small"> @bRecord.ReservationDate.ToShortDateString()</div>
+                    <div class="card-title bg-light pl-2 font-weight-bolder">@cls.ClassTitle</div>
+                    <div class="small mb-2">Class ID: @bRecord.RecordID</div>
+                    <div class="card-text">Starting at @bRecord.ReservationTime and continuing until @bRecord.ReservationTime.Add(new TimeSpan(0, bRecord.ReservationDurationHrs, 0, 0)) (@bRecord.ReservationDurationHrs hours)</div>
+                    <div class="card-text">Room(s): @Model.Rooms.Where(r => r.ID.Equals(cls.MainRoom)).Single().Name  @Model.Rooms.Where(r => r.ID.Equals(cls.SecondaryRoom)).Single().Name</div>
+                    <div class="card-text">Instructor: @Instructor.GetInstructorFromInstructorId(cls.InstructorId).InstructorCompanyName </div>
+                    <div class="card-text">Enrolled Attendees: @StudentBookings.GetAllStudentBookingsForEduClassID(cls.EduClassId).Count / Max: @cls.MaxAttendees </div>
+                    <div class="btn btn-dark float-lg-right mr-2">Modify</div>
+                    <div class="btn btn-dark float-lg-right mr-2">Action</div>
+                </div>
+            </div>
+        }
+    }
+
+    @if (TodaysBookings.Count() == 0)
+    {
+        <div class="card mb-1">
+            <div class="card-body">
+                <div class="card-title bg-light pl-2 font-weight-bolder">Oh No! :-(</div>
+                <div class="card-text">There is absolutely nothing planned for today. That is most unprofitable!</div>
+            </div>
+        </div>
+    }
+
+</div>

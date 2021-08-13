@@ -1,0 +1,549 @@
+﻿@using Attanaya_Warrior_Institute.Models
+@using Microsoft.AspNet.Identity
+@model Attanaya_Warrior_Institute.Models.Reservation
+
+@{
+    var IsMonthEligible = false;
+    var IsSubscriber = false;
+    var ReservationCount = 0;
+    var MaxReservationsForMonth = 0;
+    var MaxPersonsPerReservation = 0;
+
+    var timeList = Model.SelectedReservationTimeHelper(Model.ReservationDate, Model.SelectedReservationRoom);
+    List<Experience> experienceList = Experience.GetAllExperiences();
+    SubscriptionModel Sub = new SubscriptionModel();
+    Students StudentProfile = new Students();
+    List<MembershipPlansModel> Memberships = MembershipPlansModel.GetAllMembershipPlans();
+    MembershipPlansModel CurrentUserMembership = new MembershipPlansModel();
+
+    if (Model.AccountID != Guid.Empty)
+    {
+        Sub = SubscriptionModel.GetSubscriptionByAccountID(Model.AccountID);
+        IsSubscriber = Sub.RecordID == Guid.Empty ? false : true;
+
+        if (IsSubscriber)
+        {
+            CurrentUserMembership = Memberships.Where(plan => plan.PayPalPlanId.Equals(Sub.SubscriptionType)).SingleOrDefault();
+
+            ReservationCount = Reservation.GetReservationsForAccountId(Guid.Parse(User.Identity.GetUserId())).Where(r => r.ReservationDate.AsDateTime().Month.Equals(DateTime.Now.Month)).Count();
+            StudentProfile = Students.GetStudentByAccountID(Guid.Parse(User.Identity.GetUserId()));
+
+            MaxReservationsForMonth = CurrentUserMembership.MaxMonthlyUses;
+            MaxPersonsPerReservation = CurrentUserMembership.MaxPersonsPerSession;
+
+            if (ReservationCount < MaxReservationsForMonth || MaxReservationsForMonth == 0)
+            {
+                IsMonthEligible = true;
+            }
+        }
+    }
+}
+
+<link href="~/Content/reservation.css" rel="stylesheet" />
+
+<div class="pt-5 mt-5 forum-font">
+    <div class="mt-3">
+        <h1 class="special-elite-font"> Reservations</h1>
+    </div>
+
+    <!-- Welcome Text-->
+    @if (Utility.GetCurrentTucsonTime() < DateTime.Parse("02-01-2021 00:00:00.000") && !IsSubscriber)
+    {
+        <img class="banner-image" src="~/Images/50promobanner.png" />
+    }
+
+    @if (IsSubscriber && IsMonthEligible)
+    {
+        <div class="mb-3 h5"> <strong>Welcome, valued family member! </strong>Simply select the experience you're ready for, and book a time slot! As a valued subscriber, this session is included with your membership! You've used @ReservationCount of @MaxReservationsForMonth reservations for this month!</div>
+    }
+
+    @if (IsSubscriber && !IsMonthEligible)
+    {
+        <div class="mb-3 h5"> <strong>Welcome, valued family member! </strong>It appears you've used all of your available sessions this month! You've used @ReservationCount of @MaxReservationsForMonth reservations for this month! This session is available at standard price. Cost varies by experience. Each experience costs an initial fee, and includes admission for one person. Additional guests in the party can enjoy the experience for only $10.00 each. Maximum 4 per experience. </div>
+    }
+
+    @if (!IsSubscriber)
+    {
+        <div class="mb-3 h5"> <strong>Pricing: </strong>Cost varies by experience. Each experience costs an initial fee, and includes admission for one person. Additional guests in the party can enjoy the experience for only $10.00 each. Maximum 4 per experience. </div>
+    }
+
+    <!-- Begin REservation Form-->
+    <form class="form-inline" id="FormContainer" action="@Url.Action("Reservation", "Home")">
+        <!-- Information & Selection UI-->
+        <div class="vw-100 mb-3">
+            <div style="width: 85vw;">
+
+                <!-- Experience List-->
+                <div class="form-group mt-2 mb-5 col-md-12">
+                    <div class="form-group col-md-12">@Html.LabelFor(m => m.DesiredExperience, new { @class = "col-form-label form-label-margin" }) <i class="far fa-question-circle fa-xs" data-toggle="tooltip" data-placement="top" title="Please select your desired training experience."></i></div>
+                    <table class="table-responsive experience-scroller">
+                        <tr>
+
+                            @foreach (var exp in experienceList)
+                            {
+                                <td>
+                                    <div onclick="updatePrice()">
+                                        <span>
+                                            <div id="Exp-@exp.ExperienceID" style="display: inline">@(exp.ExperiencePrice + 10)</div>
+                                            <div style="display: inline">.00 (+ $10.00 per additional person)</div>
+                                        </span>
+                                        @{ var IsCheckedByDefault = exp.ExperienceID.Equals(experienceList.OrderBy(r => r.ExperienceID).First().ExperienceID) ? true : false;
+                                            var dic = new Dictionary<string, object>();
+
+                                            if (Model.DesiredExperience != 0)
+                                            {
+                                                if (exp.ExperienceID == Model.DesiredExperience)
+                                                {
+                                                    dic.Add("checked", "checked");
+                                                };
+                                            }
+                                            else
+                                            {
+                                                if (IsCheckedByDefault)
+                                                {
+                                                    dic.Add("checked", "checked");
+                                                };
+                                            }
+
+                                        }
+
+                                        @Html.RadioButtonFor(m => m.DesiredExperience, exp.ExperienceID, Reservation.GetHtmlAttributes(new
+                                    { @class = "experienceButton", @id = "Rdo-" + exp.ExperienceID, @onchange = "pushDataToServer('" + Url.Action("Reservation", "Home") + "')" }, dic))
+
+                                        <label for="Rdo-@exp.ExperienceID">
+                                            <img src="@exp.ExperienceImageLink" />
+                                        </label>
+                                    </div>
+                                </td>
+                            }
+                        </tr>
+                    </table>
+                </div>
+
+
+                <!-- Name and Contact Info-->
+                @{ if (!IsSubscriber)
+                    {
+                        <div class="form-row" style="margin-bottom: 20px;">
+                            <div class="form-group col-md-4">
+                                @Html.LabelFor(m => m.ReservationName, new { @class = "col-form-label form-label-margin" })<i class="far fa-question-circle fa-xs" data-toggle="tooltip" data-placement="top" title="Please enter your first and last name, so that we can attach it to the reservation."></i>
+                                @Html.TextBoxFor(m => m.ReservationName, new
+                           {
+                               @type = "text",
+                               @class = "form-control",
+                               @placeholder = "Enter Name"
+                           })
+
+                                <small id="nameHelp" class="form-text text-muted">Please enter your first AND last name.</small>
+                            </div>
+                        </div>
+
+                        <div class="form-row" style="margin-bottom: 40px;">
+                            <div class="form-group col-md-4">
+                                @Html.LabelFor(m => m.ReservationEmail, new { @class = "col-form-label form-label-margin" })<i class="far fa-question-circle fa-xs" data-toggle="tooltip" data-placement="top" title="Please enter your email address, so that we can send you confirmation of your reservation and other important information."></i>
+                                @Html.TextBoxFor(m => m.ReservationEmail, new
+                           {
+                               @type = "email",
+                               @class = "form-control",
+                               aria_describedby = "emailHelp",
+                               @placeholder = "Enter email",
+                           })
+
+                                <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
+                            </div>
+
+                            <div class="form-group col-md-4">
+                                @Html.LabelFor(m => m.ReservationPhone, new { @class = "col-form-label form-label-margin" }) <i class="far fa-question-circle fa-xs" data-toggle="tooltip" data-placement="top" title="Please enter your phone number, so that we can call you if something comes up regarding your reservation."></i>
+                                @Html.TextBoxFor(m => m.ReservationPhone, new
+                           {
+                               @type = "tel",
+                               @class = "form-control",
+                               @placeholder = "Enter phone number"
+                           })
+
+                                <small id="phoneHelp" class="form-text text-muted">We'll never share your phone number with anyone else.</small>
+                            </div>
+
+
+                            <div class="form-group col-md-4">
+                                @Html.LabelFor(m => m.ReservationGuestCount, new { @class = "col-form-label form-label-margin" })<i class="far fa-question-circle fa-xs" data-toggle="tooltip" data-placement="top" title="Please select a duration. If you are using the selector, you will notice the maximum duration will be limited to the number of consecutive hours available based on your selected date and appointment time. You can manually enter a duration, but if the duration's length exceeds available hours, the form will not submit. "></i>
+                                @Html.TextBoxFor(m => m.ReservationGuestCount, new
+                           {
+                               @id = "ReservationGuestCount",
+                               @type = "number",
+                               @class = "form-control",
+                               @min = "1",
+                               @max = "4",
+                               @Value = "1",
+                               @onchange = "updatePrice();",
+                           })
+
+                                <small id="nameHelp" class="form-text text-muted">Please select the number of participants in this reservation. Max 4 per reservation at this time (COVID-19). @*<a href="/Home/GiftCertificate">More than 4</a></small>*@
+                            </div>
+                        </div>
+                    }
+                }
+
+                @{ if (IsSubscriber)
+                    {
+                        <div class="form-row" style="margin-bottom: 20px;">
+                            <div class="form-group col-md-4">
+                                @Html.LabelFor(m => m.ReservationName, new { @class = "col-form-label form-label-margin" })<i class="far fa-question-circle fa-xs" data-toggle="tooltip" data-placement="top" title="Please enter your first and last name, so that we can attach it to the reservation."></i>
+                                @Html.TextBoxFor(m => m.ReservationName, new
+                           {
+                               @type = "text",
+                               @class = "form-control",
+                               @Value = StudentProfile.FirstName + " " + StudentProfile.LastName
+                           })
+
+                                <small id="nameHelp" class="form-text text-muted">Please enter your first AND last name.</small>
+                            </div>
+                        </div>
+
+                        <div class="form-row" style="margin-bottom: 40px;">
+                            <div class="form-group col-md-4">
+                                @Html.LabelFor(m => m.ReservationEmail, new { @class = "col-form-label form-label-margin" })<i class="far fa-question-circle fa-xs" data-toggle="tooltip" data-placement="top" title="Please enter your email address, so that we can send you confirmation of your reservation and other important information."></i>
+                                @Html.TextBoxFor(m => m.ReservationEmail, new
+                           {
+                               @type = "email",
+                               @class = "form-control",
+                               aria_describedby = "emailHelp",
+                               @Value = StudentProfile.EmailAddress
+                           })
+
+                                <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
+                            </div>
+
+                            <div class="form-group col-md-4">
+                                @Html.LabelFor(m => m.ReservationPhone, new { @class = "col-form-label form-label-margin" }) <i class="far fa-question-circle fa-xs" data-toggle="tooltip" data-placement="top" title="Please enter your phone number, so that we can call you if something comes up regarding your reservation."></i>
+                                @Html.TextBoxFor(m => m.ReservationPhone, new
+                           {
+                               @type = "tel",
+                               @class = "form-control",
+                               @Value = StudentProfile.PhoneNumber
+                           })
+
+                                <small id="phoneHelp" class="form-text text-muted">We'll never share your phone number with anyone else.</small>
+                            </div>
+
+                            @if (IsMonthEligible)
+                            {
+                                <div class="form-group col-md-4">
+                                    @Html.LabelFor(m => m.ReservationGuestCount, new { @class = "col-form-label form-label-margin" })<i class="far fa-question-circle fa-xs" data-toggle="tooltip" data-placement="top" title="Please select a duration. If you are using the selector, you will notice the maximum duration will be limited to the number of consecutive hours available based on your selected date and appointment time. You can manually enter a duration, but if the duration's length exceeds available hours, the form will not submit. "></i>
+                                    @Html.TextBoxFor(m => m.ReservationGuestCount, new
+                               {
+                                   @id = "ReservationGuestCount",
+                                   @type = "number",
+                                   @class = "form-control",
+                                   @min = "1",
+                                   @max = "4",
+                                   @onchange = "doTotalCostMathForMembers(" + MaxPersonsPerReservation + "); ",
+                               })
+
+                                    <small id="nameHelp" class="form-text text-muted">
+                                        Please select the number of participants in this reservation. Max 4 per reservation at this time (COVID-19).
+                                        @if (IsSubscriber && IsMonthEligible)
+                                        {
+                                            <strong> Up to @CurrentUserMembership.MaxPersonsPerSession included in membership.</strong>
+                                        }
+                                    </small>
+
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="form-group col-md-4">
+                                    @Html.LabelFor(m => m.ReservationGuestCount, new { @class = "col-form-label form-label-margin" })<i class="far fa-question-circle fa-xs" data-toggle="tooltip" data-placement="top" title="Please select a duration. If you are using the selector, you will notice the maximum duration will be limited to the number of consecutive hours available based on your selected date and appointment time. You can manually enter a duration, but if the duration's length exceeds available hours, the form will not submit. "></i>
+                                    @Html.TextBoxFor(m => m.ReservationGuestCount, new
+                               {
+                                   @id = "ReservationGuestCount",
+                                   @type = "number",
+                                   @class = "form-control",
+                                   @min = "1",
+                                   @max = "4",
+                                   @onchange = "updatePrice(); ",
+                               })
+
+                                    <small id="nameHelp" class="form-text text-muted">
+                                        Please select the number of participants in this reservation. Max 4 per reservation at this time (COVID-19).
+                                    </small>
+
+                                </div>
+                            }
+
+
+
+                        </div>
+                    }
+                }
+
+
+                <!-- Scheduling Portion-->
+                <div class="form-row" style="margin-bottom: 20px;">
+
+                    <div class="form-group col-md-4">
+                        @Html.LabelFor(m => m.SelectedReservationRoom, new { @class = "col-form-label form-label-margin" })<i class="far fa-question-circle fa-xs" data-toggle="tooltip" data-placement="top" title="Please select a simulator. This is the room you are reserving for your simulation experience. Each simulator has it's own schedule."></i>
+                        @Html.DropDownListFor(m => m.SelectedReservationRoom, new SelectList(
+                                                                Model.SelectedReservationRoomHelper(false, Model.DesiredExperience),
+                                                                "key",
+                                                                "value",
+                                                                selectedValue: string.IsNullOrEmpty(Model.SelectedReservationRoom.ToString()) ? "Simulation Room 01" : Model.SelectedReservationRoom.ToString()),
+                                                                new
+                                                                {
+                                                                    @id = "SelectedReservationRoom",
+                                                                    @onchange = "pushDataToServer('" + Url.Action("Reservation", "Home") + "'); updateMaxHours()",
+                                                                })
+
+                    </div>
+
+                    <div class="form-group col-md-4">
+                        @Html.LabelFor(m => m.ReservationDate, new { @class = "col-form-label form-label-margin" })<i class="far fa-question-circle fa-xs" data-toggle="tooltip" data-placement="top" title="Please select a date for your reservation. If you select a date when the facility is not open, the available appointments will read: 'Closed'."></i>
+                        @Html.TextBoxFor(m => m.ReservationDate, new
+                    {
+                        @id = "datepicker",
+                        @class = "form-control",
+                        @onchange = "pushDataToServer('" + Url.Action("Reservation", "Home") + "');"
+                    })
+
+                    </div>
+
+                    @{ if (IsSubscriber && IsMonthEligible)
+                        {
+
+                            <div class="form-group col-md-4">
+                                @Html.LabelFor(m => m.ReservationDurationHrs, new { @class = "col-form-label form-label-margin" })<i class="far fa-question-circle fa-xs" data-toggle="tooltip" data-placement="top" title="Please select a duration. If you are using the selector, you will notice the maximum duration will be limited to the number of consecutive hours available based on your selected date and appointment time. You can manually enter a duration, but if the duration's length exceeds available hours, the form will not submit. "></i>
+                                @Html.TextBoxFor(m => m.ReservationDurationHrs, new
+                           {
+                               @id = "ReservationDurationHrs",
+                               @type = "number",
+                               @class = "form-control",
+                               @min = "1",
+                               @max = timeList.Count,
+                               @onchange = "doTotalCostMathForMembers();"
+                           })
+
+                            </div>
+                        }
+                        else
+                        {
+
+                            <div class="form-group col-md-4">
+                                @Html.LabelFor(m => m.ReservationDurationHrs, new { @class = "col-form-label form-label-margin" })<i class="far fa-question-circle fa-xs" data-toggle="tooltip" data-placement="top" title="Please select a duration. If you are using the selector, you will notice the maximum duration will be limited to the number of consecutive hours available based on your selected date and appointment time. You can manually enter a duration, but if the duration's length exceeds available hours, the form will not submit. "></i>
+                                @Html.TextBoxFor(m => m.ReservationDurationHrs, new
+                            {
+                                @id = "ReservationDurationHrs",
+                                @type = "number",
+                                @class = "form-control",
+                                @min = "1",
+                                @max = timeList.Count,
+                                @onchange = "updatePrice();"
+                            })
+
+                            </div>
+                        }
+                    }
+
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(m => m.SelectedReservationTime, new { @class = "col-form-label form-label-margin" })<i class="far fa-question-circle fa-xs" data-toggle="tooltip" data-placement="top" title="Please select an appointment time. Each time is a one hour slot. If you require more than one hour, simply select the slot you want as your first hour, and attempt to increase the duration. If the slot is available, your duration will increase and you'll book the slot for the requested number of hours."></i>
+                    @Html.DropDownListFor(m => m.SelectedReservationTime, new SelectList(
+                                                             timeList,
+                                                             "key",
+                                                             "value"), new
+                                                             {
+                                                                 @onchange = "updateMaxHours()"
+                                                             })
+
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Financial UI-->
+        <div class="vw-100 mb-3">
+
+            @if (IsSubscriber && IsMonthEligible)
+            {
+
+                <div id="MemberSessionPaidMessage" class="mb-3 d-block"><div class="alert-success mb-2"> MEMBER ALERT: Cost of booking covered by subscription!</div> <div id="validateButton" class="btn btn-outline-success" onclick="BookOnValidation()">Book Member Session</div> </div>
+
+                <div id="MemberAdditionalPaymentArea" class="mb-3 d-none">
+                    @Html.HiddenFor(m => m.TotalMoney, new { @class = "form-control form-control-plaintext", @readonly = "readonly" })
+                    <div id="totalValueDisplay" class="total-value-display mb-3"></div>
+
+                    <div id="validateButton" class="btn btn-outline-success" onclick="showPaymentOnValidation()">Book Reservation</div>
+                    <div id="validation-message" class="mb-3" style="color: red"></div>
+
+                    <div id="paypal-button-container" class="d-none"> <h4 class="special-elite-font" style="padding-top: 10px; padding-bottom: 20px">Payment Information:</h4></div>
+                </div>
+
+                @Html.HiddenFor(m => m.DiscountCode, new
+                {
+                    @id = "DiscountCode",
+                    @Value = ""
+                })
+
+            }
+            else
+            {
+                if (IsSubscriber)
+                {
+                    <div> MEMBER ALERT:  Your subscription does not cover this booking! You've used @ReservationCount of @MaxReservationsForMonth sessions this month!</div>
+                }
+
+                <div class="">
+
+                    <div class="form-group mb-2">
+                        @Html.LabelFor(m => m.DiscountCode, new { @class = "col-form-label  form-label-margin" })<i class="far fa-question-circle fa-xs" data-toggle="tooltip" data-placement="top" title="If you have a discount code, enter it and click outside of the box to see your discount applied!"></i>
+                        @Html.TextBoxFor(m => m.DiscountCode, new
+                        {
+                            @id = "DiscountCode",
+                            @type = "text",
+                            @class = "form-control",
+                            @onblur = "updatePrice();"
+                        })
+                    </div>
+
+                    <div class="form-group mb-2">
+
+                        @Html.HiddenFor(m => m.TotalMoney, new { @class = "form-control form-control-plaintext", @readonly = "readonly" })
+
+                        <div class="form-group mb-3">
+                            <div id="totalValueDisplay" class="total-value-display col-12 ml-0"></div>
+                            <div id="discountIndication" class="discount-indication"> No Discount Applied</div>
+                        </div>
+
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <div id="validateButton" class="btn btn-outline-success" onclick="showPaymentOnValidation()">Book Reservation</div>
+                        <div id="validation-message" style="color: red"></div>
+                    </div>
+
+                    <div id="paypal-button-container" class="d-none"> <h4 class="special-elite-font" style="padding-top: 10px; padding-bottom: 20px">Payment Information:</h4></div>
+                </div>
+            }
+        </div>
+    </form>
+
+</div>
+<script src="~/Scripts/reservation.js"></script>
+<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<script src="~/Scripts/jquery.datetimepicker.js"></script>
+
+@*// Live SDK Client ID*@
+<!-- -->
+<script src="https://www.paypal.com/sdk/js?client-id=AVIstvNQ4gyLkuLXXefuqfQt5VHvtVu-WB6Govz2nyqUT1L7TB-Tsku5AOhp5yoEc1jtgHHgXugh-xHw&vault=true" data-sdk-integration-source="button-factory"></script> <!--  -->
+@*// Test SDK Client ID*@
+<!--
+<script src="https://www.paypal.com/sdk/js?client-id=ARwobHGwHMq6jQHcosnImEfNAqNi-uc9hyQBsHx_lYnTvzxsxzIgzbhE94nb013Dfv1E5CKpJGfumOIo&vault=true" data-sdk-integration-source="button-factory"></script><!-- -->
+<!-- PayPal JavaScript -->
+<script>
+    // Render the PayPal button into #paypal-button-container
+    paypal.Buttons({
+        // url: 'https://api.sandbox.paypal.com/v1/billing/subscriptions',
+        // Set up the transaction
+        createOrder: function (data, actions) {
+            return actions.order.create({
+                purchase_units: [{
+                    amount: {
+                        value: $('#TotalMoney').val()
+                    },
+                    application_context: {
+                        shipping_preference: 'NO_SHIPPING'
+                    }
+                }]
+            });
+        },
+
+        // Finalize the transaction
+        onApprove: function (data, actions) {
+            return actions.order.capture().then(function (details) {
+                saveBooking();
+            });
+        }
+
+    }).render('#paypal-button-container');
+</script>
+
+<!-- Page Code -->
+<script>
+    $(document).ready(function () {
+        $("#ReservationGuestCount").val("1");
+
+        updatePrice();
+
+        if ($("#ReservationName").val().length > 1) {
+            scrollToBottom();
+        };
+
+    });
+    $( function() {
+        $('#datepicker').datepicker({ minDate: 0, maxDate: "+6M +0D" });
+    });
+
+    $( function() {
+        $(document).tooltip(this);
+    });
+
+    function saveBooking() {
+
+        if (validateForm()) {
+
+            var desiredExperienceValue = $('input[name="DesiredExperience"]:checked').val();
+
+            $.ajax({
+                url: '@Url.Action("SaveBooking", "Home")',
+                data: {
+                    "reservationName":$('#ReservationName').val(),
+                    "reservationPhone":$('#ReservationPhone').val(),
+                    "reservationEmail":$('#ReservationEmail').val(),
+                    "reservationGuestCount": $('#ReservationGuestCount').val(),
+                    "reservationDate":$('#datepicker').val(),
+                    "selectedReservationTime":$('#SelectedReservationTime').val(),
+                    "reservationDurationHrs":$('#ReservationDurationHrs').val(),
+                    "selectedReservationRoom":$('#SelectedReservationRoom').val(),
+                    "desiredExperience":desiredExperienceValue,
+                    "discountCode":$('#DiscountCode').val(),
+                    "totalMoney":$('#TotalMoney').val()
+                },
+                cache: false,
+                type: "POST",
+                success: function (response) {
+                    pushDataToServer('@Url.Action("BookingReceiptAsync", "Home")');
+                },
+                error: function (response) {
+                    pushDataToServer('@Url.Action("BookingReceiptAsyncInsertFailed", "Home")');
+                }
+            });
+        }
+
+    }
+
+    function BookOnValidation() {
+        if (validateForm()) {
+            saveBooking();
+        }
+    }
+
+
+    function showPaymentOnValidation() {
+        if (validateForm()) {
+            if (discountPercentage === 100) {
+                saveBooking();
+            } else {
+                toggleVisibility('#paypal-button-container');
+            }
+        } else {
+            if ($('#paypal-button-container').hasClass("d-block")) {
+                toggleVisibility('#paypal-button-container');
+            }
+        }
+    }
+
+    function scrollToBottom() {
+        window.scrollTo(0, document.querySelector("#FormContainer").scrollHeight);
+    }
+</script>

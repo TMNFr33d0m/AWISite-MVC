@@ -1,0 +1,270 @@
+﻿/* Set padding to keep content from hitting the edges */
+.body-content {
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+.banner-image {
+    width: 97vw; 
+    max-height: 200px; 
+    margin-bottom: 20px;
+}
+
+.field-error-flash {
+    -webkit-animation-name: borderFlash; /* Safari 4.0 - 8.0 */
+    -webkit-animation-duration: 2s; /* Safari 4.0 - 8.0 */
+    animation-name: borderFlash;
+    animation-duration: 2s;
+    animation-iteration-count: infinite;
+}
+
+.form-label-margin {
+    margin-right: 10px;
+}
+
+.total-value-display{
+   font-size:large;
+   font-weight: 500;
+}
+
+#paypal-button-container {
+    width: 10vw;
+}
+
+.experience-scroller {
+    text-align: center;
+    table-layout: fixed;
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    border-collapse: separate;
+    border-spacing: 10px 0;
+}
+
+    .experience-scroller img {
+        display: block;
+        width: auto;
+        height: 50vh;
+    }
+
+.experienceButton + label {
+    filter: none;
+    -webkit-filter: grayscale(80%);
+    -moz-filter: grayscale(80%);
+    -ms-filter: grayscale(80%);
+    -o-filter: grayscale(80%);
+    cursor: pointer;
+    transition: all 300ms ease;
+}
+
+    .experienceButton:hover + label {
+        filter: none;
+        -webkit-filter: grayscale(0%);
+        -moz-filter: grayscale(0%);
+        -ms-filter: grayscale(0%);
+        -o-filter: grayscale(0%);
+    }
+
+.experienceButton:checked + label {
+    border: inset;
+    border-color: blue;
+    filter: none;
+    -webkit-filter: grayscale(0%);
+    -moz-filter: grayscale(0%);
+    -ms-filter: grayscale(0%);
+    -o-filter: grayscale(0%);
+}
+
+
+/* Safari 4.0 - 8.0 */
+@-webkit-keyframes borderFlash {
+    0% {
+        border-color: red;
+    }
+
+    5% {
+        border-color: black;
+    }
+
+    10% {
+        border-color: red;
+    }
+
+    15% {
+        border-color: black;
+    }
+
+    25% {
+        border-color: blue;
+    }
+
+    30% {
+        border-color: black;
+    }
+
+    35% {
+        border-color: blue;
+    }
+
+    40% {
+        border-color: black;
+    }
+
+    50% {
+        border-color: red;
+    }
+
+    55% {
+        border-color: black;
+    }
+
+    60% {
+        border-color: red;
+    }
+
+    65% {
+        border-color: black;
+    }
+
+    75% {
+        border-color: blue;
+    }
+
+    80% {
+        border-color: black;
+    }
+
+    85% {
+        border-color: blue;
+    }
+
+    90% {
+        border-color: black;
+    }
+
+    95% {
+        border-color: red;
+    }
+
+    100% {
+        border-color: black;
+    }
+}
+
+/* Standard syntax */
+@keyframes borderFlash {
+    0% {
+        border-color: red;
+    }
+
+    5% {
+        border-color: black;
+    }
+
+    10% {
+        border-color: red;
+    }
+
+    15% {
+        border-color: black;
+    }
+
+    25% {
+        border-color: blue;
+    }
+
+    30% {
+        border-color: black;
+    }
+
+    35% {
+        border-color: blue;
+    }
+
+    40% {
+        border-color: black;
+    }
+
+    50% {
+        border-color: red;
+    }
+
+    55% {
+        border-color: black;
+    }
+
+    60% {
+        border-color: red;
+    }
+
+    65% {
+        border-color: black;
+    }
+
+    75% {
+        border-color: blue;
+    }
+
+    80% {
+        border-color: black;
+    }
+
+    85% {
+        border-color: blue;
+    }
+
+    90% {
+        border-color: black;
+    }
+
+    95% {
+        border-color: red;
+    }
+
+    100% {
+        border-color: black;
+    }
+}
+
+/* Media query for mobile viewport */
+@media screen and (max-width: 400px) {
+    #paypal-button-container {
+        width: 90%;
+    }
+
+    .form-inline{
+        width: 75vw;
+    }
+
+    .experience-scroller {
+        text-align: center;
+        table-layout: fixed;
+        overflow-x: scroll;
+        overflow-y: hidden;
+        border-collapse: separate;
+        border-spacing: 10px 0;
+        width: 80vw;
+    }
+        .experience-scroller img {
+            display: block;
+            width: auto;
+        }
+
+    .banner-image {
+        width: 90vw;
+    }
+
+
+}
+
+/* Media query for desktop viewport */
+@media screen and (min-width: 400px) and (max-width: 1024px) {
+    #paypal-button-container {
+        width: 250px;
+    }
+
+    .banner-image {
+        width: 90vw;
+    }
+
+}

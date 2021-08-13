@@ -1,0 +1,168 @@
+﻿@using Attanaya_Warrior_Institute.Models
+@using System.Configuration;
+@model Attanaya_Warrior_Institute.Models.EduClassViewModel
+
+@{
+    ViewBag.Title = "Classes";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    IEnumerable<Rooms> RoomsList = Rooms.GetAvailableRooms();
+    string PrivateClassOnlyMode = ConfigurationManager.AppSettings["PrivateClassOnlyMode"];
+
+}
+
+<link href="~/Content/Classes.css" rel="stylesheet" />
+
+<div class="pt-5 mt-5 forum-font">
+    <div class="mt-3">
+        <h1 class="special-elite-font"> AWI Classes & Events:</h1>
+    </div>
+
+    <p class="p-2 alert-info font-weight-bolder forum-font boxshadow">
+        Note: At AWI, we track each student's attendance, scores, progress, certificates, and other information in our computer system, just like a school would.
+        Each student has a profile and a record of accomplishments at our institution. Because of this, we are not able to support multiple person sign ups (for example, you sign up yourself and three of your friends).
+        In order to sign up multiple students for a class, each student must create an account by enrolling, and then sign up for the class from that account.
+    </p>
+
+    <div class="classes-main">
+        <div class="classes class-block">
+
+            @if (bool.Parse(PrivateClassOnlyMode))
+            {
+                <div class="d-none" id="InstructorId">Attanaya Warrior Institute</div>
+                <div class="class-block-header special-elite-font">PRIVATE CLASSES</div>
+                <div class="class-block-body forum-font">
+                    Due to the COVID-19 crisis, we are unable to host open, public classes of any type at this time. In order to continue to offer quality firearms education in a safe and productive environment, we are currently offering PRIVATE CLASSES to individuals, families, and groups. Enjoy the instructor, classroom, and simulator all to yourself as you and those you invite participate in firearms education at your own pace! We are offering:
+                    <ul>
+                        <li>NRA Basic Pistol (6-8 Hours)</li>
+                        <li>NRA Basic Shotgun (6-8 Hours)</li>
+                        <li>NRA Personal Protection In The Home (4-6 Hours)</li>
+                        <li>Intro to Guns (Pistol, Rifle, Shotgun, Ammo, Cleaning, Law &Aacute; Judgmental Training, all in one class!) (6-8 Hours)</li>
+                        <li>Basic Private Security - Unarmed (8 Hours)</li>
+                        <li>Private Security Use of Force, Church Security, School Security, Active Shooter (4-8 Hours)</li>
+                    </ul>
+                    <div class="fa-2x">Pricing</div>
+                    <div>Each class, regardless of length or content, is $250.00 for the first person. For each additional person, add $100.00. </div>
+
+                    <div class="fa-2x">Booking Information</div>
+                    <div>To set up a private class, simply give us a call! Private classes follow a "whatever, whenever" policy, and special requests for schedule accommodations are accepted. Our friendly staff will work with you to schedule the course of your choice, on demand!</div>
+
+                    <div class="fa-2x">Special Scheduling</div>
+                    <div>Classes can be divided over multiple days for an additional fee of $250.00 per additional day. Classes may occur after hours for an additional fee of $250.00 per class. </div>
+
+                    <div class="fa-2x">Custom Courses</div>
+                    <div>
+                        Does you organization require a customized firearms or security training course? AWI's private security, anti terrorism, crisis negotiation and risk management experts will consult with your subject matter experts and design a firearms related training course tailored specifically for your organization. In addition to developing a lecture course that specifically addresses your policies and concerns, AWI is the only high tech training organization in the United States that has the capabilities to create simulation scenarios in your facilities and areas your staff will be operating in, bringing a useful additional layer of realism to the training and providing priceless, valuable training opportunities!
+                    </div>
+                </div>
+            }
+            else
+            {
+
+                if (Model.EduClasses.Where(e => e.StartDateTime > Utility.GetCurrentTucsonTime()).Any())
+                {
+                    foreach (var cls in Model.EduClasses.Where(eduClass => !eduClass.ClassTitle.Contains("Private Lesson") && eduClass.StartDateTime.AddHours(-2) > Utility.GetCurrentTucsonTime()))
+                    {
+
+                        var attendeesForThisClass = StudentBookings.GetAllStudentBookingsForEduClassID(cls.EduClassId);
+                        var attendeesForThisClassCount = attendeesForThisClass.Count();
+
+                        <div class="d-none" id="InstructorId">@cls.InstructorId</div>
+                        <div class="class-block-header special-elite-font">@cls.ClassTitle</div>
+                        <div class="class-block-body forum-font">
+
+
+                            @if (cls.MaxAttendees > attendeesForThisClassCount)
+                            {
+                                <div>
+                                    @if (cls.ExternalBookingSource)
+                                    {
+                                        <button class="float-right btn btn-success" onclick="window.location.assign('@cls.ExternalBookingLink')">Book Now!</button>
+                                    }
+                                    else
+                                    {
+                                        if (User.Identity.IsAuthenticated)
+                                        {
+                                            var accountID = Utility.ForceUserIDRetrievalFromName(User.Identity.Name);
+                                            var student = Students.GetStudentByAccountID(accountID);
+
+                                            if (attendeesForThisClass.Any(r => r.StudentID.Equals(student.StudentID)))
+                                            {
+                                                <div class="float-right btn btn-outline-success">Already Enrolled In This Class!</div>
+                                            }
+                                            else
+                                            {
+                                                @Html.ActionLink("Book Now!", "BookClass", "Home", new { cls.EduClassId, accountID }, new { @class = "float-right btn btn-success" });
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <div class="special-elite-font mb-2 pl-2"> Login Required to book internal class. Please login or @Html.ActionLink("Enroll Now, (it's free!)", "Register", "Account", null, new { @class = "special-elite-font" }) and then return to book the class.</div>
+                                            @Html.ActionLink("Log in", "Login", "Account", routeValues: new { @returnUrl = Url.Action(ViewContext.RouteData.Values["action"].ToString(), ViewContext.RouteData.Values["controller"].ToString()) }, htmlAttributes: new { id = "loginLink", @class = "float-right btn btn-success btn-login" });
+                                        }
+                                    }
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="special-elite-font mb-2 pl-2"> CLASS SOLD OUT! </div>
+                            }
+
+                            <div class="class-block-instructor"> Instructor: @Instructor.GetInstructorFromInstructorId(cls.InstructorId).InstructorCompanyName</div>
+
+                            <div class="class-block-description">
+                                <div>
+                                    <strong>Description:</strong>
+
+                                    <div type="button"
+                                         onclick="toggleVisibility('#A@(Utility.Truncate(cls.EduClassId.ToString(), 5) + "preview")')"
+                                         class="btn-link small"
+                                         data-toggle="collapse"
+                                         data-target="#A@(Utility.Truncate(cls.EduClassId.ToString(), 5) + "collapse")"
+                                         aria-expanded="false"
+                                         aria-controls="A@(Utility.Truncate(cls.EduClassId.ToString(), 5) + "collapse")">
+                                        Expand...
+                                    </div>
+                                    <div id="A@(Utility.Truncate(cls.EduClassId.ToString(), 5) + "preview")">@Utility.Truncate(cls.Description, 100)...</div>
+
+                                    <div class="collapse" id="A@(Utility.Truncate(cls.EduClassId.ToString(), 5) + "collapse")">
+                                        <div>@cls.Description</div>
+                                    </div>
+                                </div>
+
+                                <div><strong>When:</strong></div>
+                                <div></div>
+                                <div>@cls.StartDateTime.ToShortDateString(), @cls.StartDateTime.ToShortTimeString() until @cls.EndDateTime.ToShortTimeString()</div>
+                                <div><strong>Where:</strong></div>
+                                <div>@RoomsList.Where(r => r.ID.Equals(cls.MainRoom)).Single().Name @(cls.SecondaryRoom != 0 && cls.SecondaryRoom != 7 ? string.Format(" & " + RoomsList.Where(r => r.ID.Equals(cls.SecondaryRoom)).Single().Name) : string.Empty)</div>
+                                <div><strong>Max Attendees:</strong></div>
+                                <div>
+                                    @{ if (attendeesForThisClassCount >= (cls.MaxAttendees / 2))
+                                        {
+                                            <div>@cls.MaxAttendees - only @(cls.MaxAttendees - attendeesForThisClassCount) seats remaining!</div>
+                                        }
+                                        else
+                                        {
+                                            <div>@cls.MaxAttendees - Plenty of seats remaining! </div>
+                                        }
+                                    }
+
+                                </div>
+
+                                <div><strong>Cost:</strong></div>
+                                <div>$@cls.CostPerStudent</div>
+                                <div>@(cls.ExternalBookingSource == true ? "This class is handled by an external site. You will be redirected to the booking site when you click the Book Now button." : "")</div>
+                            </div>
+
+                        </div>
+
+                    }
+                }
+                else
+                {
+                    <div>No Classes Scheduled At This Time. :-( </div>
+                }
+            }
+        </div>
+    </div>
+</div>

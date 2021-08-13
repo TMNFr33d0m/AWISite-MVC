@@ -1,0 +1,120 @@
+﻿@using Attanaya_Warrior_Institute.Models
+
+@{
+    ViewBag.Title = "Memberships";
+
+    var membershipPlansCollection = MembershipPlansModel.GetAllMembershipPlans();
+
+}
+
+@*<div id="spacer" style="height: 100px;"></div>*@
+
+    <div class="pt-5 mt-5 forum-font">
+        <div class="mt-3">
+            <h1 class="mt-2 mb-3 special-elite-font">Membership Packages:</h1>
+        </div>
+            <div id="cardParent" class="row">
+
+                <!-- Grab only the plans that have not exceeded the max count, OR if max count is 0, then no max count, so unlimited, so grab that too.-->
+                @foreach (var plan in membershipPlansCollection.Where(p => SubscriptionModel.GetPlanCountByPlanID(p.PayPalPlanId) < p.PlanPurchaseMaxCount || p.PlanPurchaseMaxCount == 0))
+                {
+                    <div class="col-lg-3 col-md-6 col-sm-12">
+                        <div class="card">
+
+                            <img class="card-img-top" src="@plan.PlanCardImagePath" alt="Card image cap">
+
+                            <div id="@(plan.RecordId + "-DescriptionParent")" class="card-body">
+                                <h4 class="card-title" id="@(plan.RecordId + "-Title")">@plan.PlanName.Trim()</h4>
+                                <p class="card-text small" id="@(plan.RecordId + "-Description")">@plan.PlanDescription.Trim()</p>
+
+
+                                <ul class="list-group list-group-flush small">
+                                    <li class="list-group-item">
+                                        Includes full access to all facilities! That's simulators, software, sim weapons and BYOG conversion devices. Everything you need to enjoy great simulation experiences any time you want!
+                                        You must still use our online system to book reservations. Member walk-ins are welcome but we cannot guarantee availability in such cases.
+                                    </li>
+                                    <li class="list-group-item">Includes access to members only classes and workshops monthly, for no additional fees!</li>
+                                    <li id="@(plan.RecordId + "-PriceDisplay")" class="list-group-item font-weight-bold font-italic">Only $@plan.PlanPricePerMonth  / month!!</li>
+                                </ul>
+                            </div>
+                            <div id="@(plan.RecordId + "-DescriptionSpouse")" class="card-body">
+
+                                @if (User.Identity.IsAuthenticated)
+                                {
+
+                                    var accountID = Utility.ForceUserIDRetrievalFromName(User.Identity.Name);
+
+                                    <div class="btn btn-outline-success" id="@(plan.PayPalPlanId + "-PayPalButtonSpawner")" onclick="CreateMembershipSubscriptionPaypalButton('@plan.PayPalPlanId.Trim()','@plan.RecordId.ToString()')">Purchase Membership</div>
+                                }
+                                else
+                                {
+                                    <div class="special-elite-font mb-2 pl-2"> You must first create an account to purchase a membership! Please login or @Html.ActionLink("Enroll Now, (it's free!)", "Register", "Account", null, new { @class = "special-elite-font" }) and then return to purchase the membership upgrade for your account.</div>
+                                    @Html.ActionLink("Log in", "Login", "Account", routeValues: new { @returnUrl = Url.Action(ViewContext.RouteData.Values["action"].ToString(), ViewContext.RouteData.Values["controller"].ToString()) }, htmlAttributes: new { id = "loginLink", @class = "float-left btn btn-success btn-login" });
+                                }
+                            </div>
+
+                            <div class="mt-3 p-2" id="@(plan.PayPalPlanId+"-paypal-button-container")"></div>
+
+                        </div>
+                    </div>
+                }
+
+            </div>
+    </div>
+
+    @*// Live SDK Client ID*@
+    <!-- -->
+    <script src="https://www.paypal.com/sdk/js?client-id=AVIstvNQ4gyLkuLXXefuqfQt5VHvtVu-WB6Govz2nyqUT1L7TB-Tsku5AOhp5yoEc1jtgHHgXugh-xHw&vault=true" data-sdk-integration-source="button-factory"></script> <!--  -->
+    @*// Test SDK Client ID*@
+    <!-- <script src="https://www.paypal.com/sdk/js?client-id=ARwobHGwHMq6jQHcosnImEfNAqNi-uc9hyQBsHx_lYnTvzxsxzIgzbhE94nb013Dfv1E5CKpJGfumOIo&vault=true" data-sdk-integration-source="button-factory"></script><!-- -->
+
+    <script>
+
+        function CreateMembershipSubscriptionPaypalButton(planId) {
+
+        paypal.Buttons({
+            //url:'https://api.sandbox.paypal.com/v1/billing/subscriptions',
+            style: {
+                shape: 'rect',
+                color: 'gold',
+                layout: 'vertical',
+                label: 'subscribe',
+
+            },
+            createSubscription: function (data, actions) {
+                return actions.subscription.create({
+                    'plan_id': planId
+                });
+            },
+            onApprove: function (data, actions) {
+                //alert(data.subscriptionID);
+                insertSubscriptionIntoDatabase(data.subscriptionID, planId);
+            }
+        }).render('#' + planId + '-paypal-button-container');
+
+        $('#' + planId + "-PayPalButtonSpawner").hide();
+
+        }
+
+        function insertSubscriptionIntoDatabase(subscriptionID, PlanId) {
+
+        $.ajax({
+        url: '@Url.Action("CreateMembership", "Home")',
+        data: {
+            "SubscriptionId": subscriptionID,
+            "PlanId": PlanId
+        },
+        cache: false,
+        type: "POST",
+        success: function (response) {
+            window.location.href ='@Url.Action("Dashboard", "Home")'
+        },
+        error: function (response) {
+            alert('Something\'s wrong! Please call us at (520) 253-5270 and we will get it worked out.');
+        }
+        });
+
+
+        }
+    </script>
+

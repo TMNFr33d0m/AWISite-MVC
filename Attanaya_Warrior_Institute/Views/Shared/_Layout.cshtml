@@ -1,0 +1,134 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" /> <!-- Optimal Internet Explorer compatibility -->
+    <meta name="keywords" content="CCW, CHL, USCCA, Firearms, Simulation, Instruction, NRA, Classes, Shooting, Training, Firearms Training, Firearms Simulation, Shooting Range, Entertainment, Bachelor Parties, Bachelorette, Tucson, AZ, Arizona, Concealed, Concealed Carry, Security, Guard Card, Private Security, Self Defense, Fighting, Gunfighting, Fun, Arcade, Virtual Reality, Video Game, Airsoft, Laser, Lasershot, LaserAmmo, Infrared Laser, Infrared, Reservations, Reservation, VIP, Party" />
+    <meta name="author" content="Attanaya Warrior Institute">
+    <meta name="description" content="AWI is a high tech firearms simulation training facility that allows civilians, law enforcement and private security to develop their use of force abilities in a safe and cost effective virtual reality environment. In short - It's like a gym for gun owners." />
+    <meta property="og:title" content="Attanaya Warrior Institute" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="http://www.attanaya.com" />
+    <meta property="og:image" content="http://www.attanaya.com/images/Brand_Image_Anjelic_01.png" />
+    <meta property="og:image:secure_url" content="https://www.attanaya.com/images/Brand_Image_Anjelic_01.png" />
+    <meta property="og:description"
+          content=" AWI is a high tech firearms simulation training facility that allows civilians, law enforcement and private security to develop
+          their use of force abilities in a safe and cost effective virtual reality environment. In short - It's like a gym for gun owners.
+        " />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:site_name" content="Attanaya Warrior Institute" />
+
+
+    <title>Attanaya Warrior Institute</title>
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <link href="~/Content/layout.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css?family=Special+Elite&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Economica&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Forum&display=swap" rel="stylesheet">
+
+    <script src="https://kit.fontawesome.com/fe7fd6d4f2.js" crossorigin="anonymous"></script>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-75451847-2"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag() { dataLayer.push(arguments); }
+
+        gtag('js', new Date());
+
+        gtag('config', 'UA-75451847-2');
+    </script>
+
+</head>
+
+
+<body class="mh-100">
+ 
+    <div id="disableScreen" class="d-none"> </div>
+
+    <div id="header" class="forum-font">
+
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+
+            <a class="navbar-brand" href="@Url.Action("Index", "Home")"><img id="logo-image" class="navbar-brand logo-small" src="~/Images/AttanayaWarriorInstituteLogoWMotto.png" /></a>
+
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="@Url.Action("Index", "Home")">Home <span class="sr-only">(current)</span></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="@Url.Action("Reservation", "Home")">Hourly Reservations</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="@Url.Action("Classes", "Home")">Classes & Events</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="@Url.Action("Memberships", "Home")">Membership Packages</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="@Url.Action("Hours", "Home")">Hours / Location</a>
+                    </li>
+                    <li class="nav-item dropdown bg-dark">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            More Information
+                        </a>
+                        <div class="dropdown-menu bg-dark" aria-labelledby="navbarDropdown">
+                            @*<a class="dropdown-item nav-link disabled" href="@Url.Action("About", "Home")">Coming Soon</a>*@
+                            <a class="dropdown-item nav-link" href="@Url.Action("Rules", "Home")">Rules</a>
+                            <a class="dropdown-item nav-link" href="@Url.Action("Faq", "Home")">FAQ</a>
+                            <a class="dropdown-item nav-link" href="@Url.Action("Byog", "Home")">Bring Your Own Gun (BYOG)</a>
+                            <a class="dropdown-item nav-link" href="@Url.Action("Instructors", "Home")">Instructor Partnership</a>
+                        </div>
+                    </li>
+
+                    <li class="nav-item dropdown bg-dark">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown2" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Security Academy</a>
+                        <div class="dropdown-menu bg-dark" aria-labelledby="navbarDropdown2">
+                            <a class="dropdown-item nav-link" href="~/pdf/ArizonaLawsForSecurity.pdf">Law Reference For Security</a>
+                        </div>
+                    </li>
+                </ul>
+                <div style="padding-right: 20px;">@Html.Partial("_LoginPartial", "Account")</div>
+            </div>
+        </nav>
+    </div>
+
+    <div class="body-content">
+        @RenderBody()
+
+        <footer class="mt-2 special-elite-font">
+
+            <span>&copy; @DateTime.Now.Year Attanaya Warrior Institute - All Rights Reserved</span>
+            <div class="float-right" style="font-size: x-large; position: relative; float: right">
+                <i class="fab fa-instagram mr-3 pointer-cursor" onclick="window.location.assign('http://www.instagram.com/attanayawarriorinstitute')"></i> <i class="fab fa-twitter mr-3 pointer-cursor" onclick="window.location.assign('http://www.twitter.com/attanayaAZ')"></i>
+            </div>
+        </footer>
+
+    </div>
+
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/jqueryval")
+    @Scripts.Render("~/bundles/custom")
+    @Scripts.Render("~/bundles/bootstrap")
+    @RenderSection("scripts", required: false)
+
+    <script>
+        $(function () {
+            $('[data-toggle="tooltip"]').tooltip();
+        });
+
+    </script>
+</body>
+</html>

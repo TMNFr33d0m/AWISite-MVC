@@ -1,0 +1,223 @@
+﻿/* Set padding to keep content from hitting the edges */
+.body-content {
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+.inline-image-L {
+    height: 512px;
+    width: 512px;
+    float: left;
+    float: left;
+    float: right;
+}
+
+.inline-image-R {
+    height: 512px;
+    width: 512px;
+    float: right;
+    margin-right: 50px;
+}
+
+.image-slider-item {
+    height: 600px;
+    width: inherit;
+    margin: 0 auto;
+}
+
+.cacAdImage {
+    height: 400px;
+    width: 350px;
+}
+
+.front-page-adimage-small {
+    max-height: 350px;
+    max-width: 350px;
+    min-height: 250px; 
+    min-width: 250px;
+    margin: 10px;
+    border: ridge;
+    border-width: 2px;
+    border-color: black; 
+    float: right;
+}
+
+.video-player-parent {
+    align-content: center;
+    text-align: center;
+    margin-top: 5px;
+    margin-bottom: 10px;
+    background: url('../Images/TrioShot_01.png');
+    background-repeat: no-repeat;
+    background-position-x: center;
+    background-size: cover;
+    background-position-y: -20vh;
+}
+
+.video-player {
+    max-width: inherit;
+    max-height: 55vh;
+    border: ridge;
+    border-width: 3px;
+    border-color: black;
+    border-radius: 10px;
+}
+
+.video-player-small {
+    max-width: inherit;
+    max-height: 35vh;
+    border: ridge;
+    border-width: 3px;
+    border-color: black;
+    border-radius: 10px;
+    position: relative;
+    float: right;
+}
+
+.video-player-parent-small {
+    margin-top: 40px;
+    margin-bottom: 10px;
+    float: right;
+}
+
+@media screen and (max-width: 1300px) {
+    .video-player-parent {
+        align-content: center;
+        text-align: center;
+        background: black;
+    }
+
+    .video-player {
+        max-width: 90vw;
+        max-height: 40vh;
+    }
+
+    .video-player-small {
+        max-width: 90vw;
+        max-height: 40vh;
+    }
+
+    .front-page-adimage-small {
+        max-height: 200px;
+        max-width: 200px;
+        min-height: 50px;
+        min-width: 50px;
+    }
+
+    .jumbotron {
+        background-color: white;
+        padding: 0px;
+    }
+
+    .inline-image-L {
+        position: relative;
+        height: 128px;
+        width: 128px;
+        float: left;
+    }
+
+    .inline-image-R {
+        position: relative;
+        height: 128px;
+        width: 128px;
+        float: right;
+    }
+
+    .careImage {
+        height: auto;
+        max-width: 100%;
+        margin: 10px;
+        float: right;
+        cursor: pointer;
+    }
+}
+
+
+
+/* Style the Image Used to Trigger the Modal */
+#myImg {
+    border-radius: 5px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+    #myImg:hover {
+        opacity: 0.7;
+    }
+
+/* The Modal (background) */
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Sit on top */
+    padding-top: 100px; /* Location of the box */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgb(0,0,0); /* Fallback color */
+    background-color: rgba(0,0,0,0.9); /* Black w/ opacity */
+}
+
+/* Modal Content (Image) */
+.modal-content {
+    margin: auto;
+    display: block;
+    width: 80%;
+    max-width: 700px;
+}
+
+/* Caption of Modal Image (Image Text) - Same Width as the Image */
+#caption {
+    margin: auto;
+    display: block;
+    width: 80%;
+    max-width: 700px;
+    text-align: center;
+    color: #ccc;
+    padding: 10px 0;
+    height: 150px;
+}
+
+/* Add Animation - Zoom in the Modal */
+.modal-content, #caption {
+    animation-name: zoom;
+    animation-duration: 0.6s;
+}
+
+@keyframes zoom {
+    from {
+        transform: scale(0)
+    }
+
+    to {
+        transform: scale(1)
+    }
+}
+
+/* The Close Button */
+.close {
+    position: absolute;
+    right:  20vw;
+    top: 80vh;
+    color: #f1f1f1;
+    font-size: 40px;
+    font-weight: bold;
+    transition: 0.3s;
+    z-index: 99;
+}
+
+    .close:hover,
+    .close:focus {
+        color: #bbb;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+/* 100% Image Width on Smaller Screens */
+@media only screen and (max-width: 700px) {
+    .modal-content {
+        width: 100%;
+    }
+}

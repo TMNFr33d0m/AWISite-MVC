@@ -1,0 +1,82 @@
+﻿
+@using Attanaya_Warrior_Institute.Models
+@using IronBarCode
+@model Attanaya_Warrior_Institute.Models.GiftCertificateModel
+
+@{
+    ViewBag.Title = "PackageReceipt";
+}
+
+    <div style="margin-top: 100px;">
+        <h1 class="special-elite-font"> Your purchase is confirmed!</h1>
+
+        <div style="padding-left: 40px;">
+            <h2 class="special-elite-font"> Package Information:</h2>
+            <div style="font-size: large; margin-bottom: 20px;">
+
+                <h3 class="special-elite-font" style="color: darkred; margin-bottom: 20px;"> <i class="far fa-envelope"></i> Check your email for a reservation confirmation!</h3>
+                <div id="barcodeContainer" class="mb-3">
+                    <div class="special-elite-font col-md-12">Reservation ID:</div>
+                    <img id="barcode" src="data:image/png;base64,@(Convert.ToBase64String(BarcodeWriter.CreateBarcode(Model.GiftCertificateNumber.ToString(), BarcodeWriterEncoding.Code128).ResizeTo(300, 100).ToPngBinaryData()))" />
+                    <br />@Model.GiftCertificateNumber
+                </div>
+
+                <div class="special-elite-font"> Purchaser Information:</div>
+                <div><strong>Name: </strong>@(string.Format((Model.PurchaserFirstName) + " " + @Model.PurchaserMiddleName + " " + @Model.PurchaserLastName))</div>
+                <div><strong>Email Address: </strong>@Html.DisplayTextFor(m => m.PurchaserEmailAddress)</div>
+                <div><strong>Client Phone: </strong>@Html.DisplayTextFor(m => m.PurchaserPhoneNumber)</div>
+                <hr />
+                <div class="special-elite-font">Recipient Information:</div>
+                <div><strong>Recipient Name: </strong>@Html.DisplayTextFor(m => m.RecipientName)</div>
+                <div><strong>Recipient Phone: </strong>@Html.DisplayTextFor(m => m.RecipientPhone)</div>
+                <div><strong>Recipient Email: </strong>@Html.DisplayTextFor(m => m.RecipientEmail)</div>
+                <hr />
+                <div class="special-elite-font">Package:</div>
+                <div id="PackageDescription"></div>
+                <hr />
+                <div class="special-elite-font">Receipt:</div>
+                <div><strong>Total Paid: $</strong><div id="totalPrice"></div></div>
+
+            </div>
+
+            <button class="btn btn-success" onclick="window.location.href= '@Url.Action("Index", "Home")'">All Done!</button>
+
+        </div>
+    </div>
+
+<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<script>
+
+    var barcodeBinary;
+
+    $(document).ready(function () {
+        GetPackageObjectForReceipt();
+        });
+
+    function GetPackageObjectForReceipt() {
+
+        var dataVals = {
+            'id': '@Model.PackageType'
+        };
+
+        $.ajax({
+            type: "GET",
+            url: "/Home/GetPackageDescriptionFromId",
+            data: dataVals,
+            contentType: "application/json; charset=utf-8",
+            dataType: "json"
+        }).done(function (result) {
+            var object = JSON.parse(result);
+
+            document.getElementById("PackageDescription").innerHTML = object.PackageDescription;
+            document.getElementById("totalPrice").innerText = "$" + object.PackagePrice + ".00";
+
+        }).fail(function (result) {
+            console.log("Failed to get description.");
+            console.log(result);
+
+        });
+    };
+
+</script>

@@ -1,0 +1,57 @@
+﻿.careImage {
+    height: 550px;
+    width: 550px;
+    margin: 10px;
+    float: left;
+}
+
+@media screen and (max-width: 760px) {
+
+    #header {
+        background-color: lightgray;
+        top: 0;
+    }
+
+    .video-player-parent {
+        align-content: center;
+        text-align: center;
+    }
+
+    .video-player {
+        width: 90vw;
+        height: 30vh;
+    }
+
+
+    .image-slider-item {
+        height: inherit;
+        width: 70vw;
+        margin: 0 auto;
+    }
+
+    .jumbotron {
+        background-color: white;
+        padding: 0px;
+    }
+
+    .inline-image-L {
+        position: relative;
+        height: 128px;
+        width: 128px;
+        float: left;
+    }
+
+    .inline-image-R {
+        position: relative;
+        height: 128px;
+        width: 128px;
+        float: right;
+    }
+
+    .careImage {
+        height: 300px;
+        width: 90vw;
+        margin: 10px;
+    }
+
+}

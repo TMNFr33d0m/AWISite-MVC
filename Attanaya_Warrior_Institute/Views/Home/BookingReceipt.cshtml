@@ -1,0 +1,54 @@
+﻿@using Attanaya_Warrior_Institute.Models
+@using Microsoft.AspNet.Identity
+@model Attanaya_Warrior_Institute.Models.Reservation
+
+@{
+    ViewBag.Title = "BookingReceipt";
+    IEnumerable<Rooms> RoomsList = Rooms.GetAvailableRooms();
+    Experience Exp = Experience.GetExperienceByID(Model.DesiredExperience);
+}
+
+
+
+<div class="forum-font mt-1">
+    <h1 class="special-elite-font"> Your reservation is confirmed!</h1>
+
+    <div style="padding-left: 40px;">
+        <h2 class="special-elite-font"> Reservation Information:</h2>
+        <div style="font-size: large; margin-bottom: 20px;">
+
+            <h3 class="special-elite-font" style="color: darkred; margin-bottom: 20px;"> <i class="far fa-envelope"></i> Check your email for a reservation confirmation!</h3>
+            <h5>Your reservation is in the system!  Here are the details: </h5>
+
+            <div class="special-elite-font"> Client Information:</div>
+            <div><strong>Name: </strong>@Html.DisplayTextFor(m => m.ReservationName)</div>
+            <div><strong>Email Address: </strong>@Html.DisplayTextFor(m => m.ReservationEmail)</div>
+            <div><strong>Client Phone: </strong>@Html.DisplayTextFor(m => m.ReservationPhone)</div>
+            <hr />
+            <div class="special-elite-font">Reservation:</div>
+            <div><strong>Date Of Reservation: </strong>@Html.DisplayTextFor(m => m.ReservationDate)</div>
+            <div><strong>Time Of Reservation: </strong>@Html.DisplayTextFor(m => m.SelectedReservationTime)</div>
+            <div><strong>Duration Of Reservation: </strong>@Html.DisplayTextFor(m => m.ReservationDurationHrs) hrs</div>
+            <div><strong>Number in Party: </strong>@Html.DisplayTextFor(m => m.ReservationGuestCount)</div>
+            <div><strong>Simulation Room: </strong>@Html.DisplayTextFor(m => RoomsList.Where(r => r.ID.Equals(m.SelectedReservationRoom)).Single().Name) </div>
+            <hr />
+            <h4 class="special-elite-font"> You selected the @Exp.ExperienceTitle! </h4>
+            <img class="embed-responsive w-auto mb-5" src="@Exp.ExperienceImageLink" alt="Exp Card Image" />
+            <div class="special-elite-font fa-2x">Receipt:</div>
+            <div class="mb-5"><strong>Total Paid: $</strong>@Html.DisplayTextFor(m => m.TotalMoney) </div>
+
+            <div class="small">
+                <div>We're located at 1802 W Grant Rd, #107, between I-10 and Silverbell, right next to Sherwin-Williams. <a href="https://goo.gl/maps/C8Cgi7iDp6gfDnyA9">Google Maps </a></div>
+                <div><strong> If you are bringing your own gun, please make sure you are not bringing any ammo! </strong></div>
+                We do not allow live ammunition in our facility, for safety reasons. Please bring your weapon in the locked-open position with NO AMMUNITION in your weapon or on your person. 
+                <br />
+                <div><strong> Your time starts at your scheduled time slot! </strong> Please do not be late. We cannot compensate you for time lost, and we cannot extend your session in order to be fair to others who may have booked the slot after you. Any time missed is time lost. </div>
+                <div><strong> NO REFUNDS, NO RESCHEDULES INSIDE 24 HOURS! </strong> - With 24 hours notice on a future reservation, we can attempt to accommodate rescheduling to any date in the future of the reservation date. Call (520) 253-5270 to talk to someone about rescheduling.</div>
+            </div>
+            @*<div>@Html.DisplayTextFor(m => m.DiscountCode.Length > 0 ? "With Discount!" : "")</div>*@
+        </div>
+
+        <button class="btn btn-success" onclick="window.location.href= '@Url.Action("Index", "Home")'">All Done!</button>
+
+    </div>
+</div>

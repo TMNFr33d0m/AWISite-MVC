@@ -1,0 +1,53 @@
+﻿@model Attanaya_Warrior_Institute.Models.ClassBookingReceiptModel
+
+@{
+    ViewBag.Title = "ClassBooking";
+}
+    <div class="mt-2 forum-font">
+        <h2 class="special-elite-font">Class Booked! Check your email! </h2>
+
+        <h3 class="special-elite-font">Student Information:</h3>
+        <div class="mb-2 forum-font">
+            @Html.HiddenFor(n => n.EduClassId, new { @id = "EduClassId" })
+            @Html.HiddenFor(n => n.StudentId, new { @id = "StudentId" })
+
+            <div>
+                <div class="font-weight-bold" id="firstNameTitle">Student Name: </div>
+                <div id="firstName">@Model.FirstName</div>
+            </div>
+
+            <div>
+                <div class="font-weight-bold" id="emailAddressTitle">Email Address: </div>
+                <div id="emailAddress">@Model.EmailAddress</div>
+            </div>
+
+            <div>
+                <div class="font-weight-bold" id="phoneNumberTitle">Phone Number: </div>
+                <div id="phoneNumber">@Model.PhoneNumber</div>
+            </div>
+        </div>
+
+        <h3 class="special-elite-font mb-2"> Class Information</h3>
+        <div class="mb-2 forum-font">
+            <div>
+                <div class="font-weight-bold" id="classTitleTitle">Class: </div>
+                <div id="classTitle">@Model.ClassTitle</div>
+            </div>
+
+            <div>
+                <div class="font-weight-bold">Class Time: </div>
+                <div class="forum-font"><div id="classTimeStart">@Model.StartDateTime</div> - <div id="classTimeEnd"> @Model.EndDateTime</div></div>
+            </div>
+
+            <div class="forum-font">
+                <div class="font-weight-bold"> Maximum Attendees:</div>
+                <div id="maxAttendees">@Model.MaxAttendees</div>
+            </div>
+        </div>
+
+        <div class="forum-font">
+            Cost: $@Model.TotalPrice.00     PAID
+        </div>
+
+        <div class="btn btn-success" onclick="window.location.assign('@Url.Action("Index", "Home", Model)')">All Done! </div>
+    </div>

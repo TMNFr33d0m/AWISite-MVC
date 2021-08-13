@@ -1,0 +1,65 @@
+﻿.classes {
+    font-size: large;
+}
+
+.classes-main {
+    border: outset;
+    border-width: 1px;
+    border-color: black;
+    padding: 5px;
+}
+
+.class-block {
+
+}
+
+.class-block-header {
+    background: darkred;
+    color: white;
+    font-weight: bold;
+    padding-left: 10px;
+    font-size: x-large;
+}
+
+.class-block-body {
+    background: lightgray;
+    padding-right: 5px;
+    padding-top: 5px;
+}
+
+.class-block-instructor {
+    font-weight: bold;
+    margin-bottom: 20px;
+    margin-left: 10px;
+}
+
+.class-block-description {
+    padding-left: 25px;
+    padding-bottom: 5px;
+}
+
+/* Style the button that is used to open and close the collapsible content */
+.collapsible {
+    background-color: #eee;
+    color: #444;
+    cursor: pointer;
+    padding: 18px;
+    width: 100%;
+    border: none;
+    text-align: left;
+    outline: none;
+    font-size: 15px;
+}
+
+    /* Add a background color to the button if it is clicked on (add the .active class with JS), and when you move the mouse over it (hover) */
+    .active, .collapsible:hover {
+        background-color: #ccc;
+    }
+
+/* Style the collapsible content. Note: hidden by default */
+.content {
+    padding: 0 18px;
+    display: none;
+    overflow: hidden;
+    background-color: #f1f1f1;
+}

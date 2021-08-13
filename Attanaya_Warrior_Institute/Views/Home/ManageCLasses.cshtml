@@ -1,0 +1,332 @@
+﻿@using Attanaya_Warrior_Institute.Models
+@model Attanaya_Warrior_Institute.Models.EduClass
+
+@{
+    ViewBag.Title = "Event Manager";
+    var bookingModel = new Reservation();
+    IEnumerable<Rooms> roomList = Rooms.GetAvailableRooms();
+    Instructor instructor = Instructor.GetInstructorFromInstructorId(Model.InstructorId);
+    var timeList = bookingModel.SelectedReservationTimeHelper(bookingModel.ReservationDate, bookingModel.SelectedReservationRoom);
+}
+
+<link href="~/Content/manage-classes.css" rel="stylesheet" />
+
+<div style="margin-top: 100px;">
+    <h1 class="special-elite-font mb-2">Event Manager</h1>
+
+    @using (Html.BeginForm())
+    {
+        @Html.AntiForgeryToken()
+
+        <div class="form-horizontal">
+            <h3 class="special-elite-font">Create A New Class </h3>
+            <p>Please enter the information about your event below. This will be displayed on our classes page exactly as you write it, so make sure to keep the customer in mind! </p>
+            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+            <div class="form-group">
+                <div class="fa-stack-1x" style="margin-bottom: 30px;"><strong> Instructor: @instructor.InstructorCompanyName</strong></div>
+                <div class="form-group">
+                    @Html.HiddenFor(model => model.InstructorId, new { @id = "InstructorID" })
+                    @Html.HiddenFor(model => model.EduClassId, new { @id = "EduClassID" })
+
+                    @Html.LabelFor(model => model.ClassTitle, htmlAttributes: new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.TextBoxFor(
+                            model => model.ClassTitle, new
+                            {
+                                @class = "form-control col-md-12",
+                                @type = "text", 
+                                @placeholder = "Enter Name of Class"
+                            }
+                        )
+
+                        <small id="nameHelp" class="form-text text-muted">Please enter the title of the class.</small>
+
+                        @Html.ValidationMessageFor(model => model.ClassTitle, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.StartDateTime, htmlAttributes: new { @class = "control-label col-md-2" })
+                    <div class="col-md-2">
+                        @Html.TextBoxFor(model => model.StartDateTime, "{0:yyyy-MM-ddTHH:mm:ss}", new
+                   {
+                       @id = "datepicker",
+                       @class = "input-group date",
+                       @type = "datetime-local",
+                       @value = Model.StartDateTime.ToString("{0:yyyy-MM-ddTHH:mm:ss}")
+                   })
+
+                        @Html.ValidationMessageFor(model => model.StartDateTime, "", new { @class = "text-danger" })
+                    </div>
+
+                    @Html.LabelFor(model => model.EndDateTime, htmlAttributes: new { @class = "control-label col-md-2" })
+                    <div class="col-md-2">
+
+
+                        @Html.TextBoxFor(model => model.EndDateTime, "{0:yyyy-MM-ddTHH:mm:ss}", new
+                   {
+
+
+                       @id = "datepicker2",
+                       @class = "input-group date",
+                       @type = "datetime-local",
+                       @value = Model.EndDateTime.ToString("{0:yyyy-MM-ddTHH:mm:ss}")
+                   })
+                        @Html.ValidationMessageFor(model => model.EndDateTime, "", new { @class = "text-danger" })
+                    </div>
+
+                </div>
+
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.Description, htmlAttributes: new { @class = "control-label col-md-2" })
+
+                    <div class="col-md-10">
+                        @Html.TextAreaFor(model => model.Description, new { @class = "form-control col-md-12" })
+                        @Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+
+                <div class="form-group col-md-4">
+                    @Html.LabelFor(model => model.MainRoom, htmlAttributes: new { @class = "col-form-label form-label-margin" })<i class="far fa-question-circle fa-xs" data-toggle="tooltip" data-placement="top" title="Please select a classroom. This is the main room you are reserving for your student's learning experience."></i>
+
+                    <div class="col-md-10">
+
+                        @Html.DropDownListFor(
+                        model => model.MainRoom, new SelectList(
+                        bookingModel.SelectedReservationRoomHelper(true, 0),
+                        "key",
+                        "value",
+                        selectedValue: string.IsNullOrEmpty(bookingModel.SelectedReservationRoom.ToString()) ? "Simulation Room 01" : bookingModel.SelectedReservationRoom.ToString()),
+                        new
+                        {
+                            @id = "SelectedReservationRoom"
+                        })
+
+                        @Html.ValidationMessageFor(model => model.MainRoom, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="form-group col-md-4">
+                    @Html.LabelFor(model => model.SecondaryRoom, htmlAttributes: new { @class = "col-form-label form-label-margin" })<i class="far fa-question-circle fa-xs" data-toggle="tooltip" data-placement="top" title="Please select a classroom. This is the main room you are reserving for your student's learning experience."></i>
+
+                    <div class="col-md-10">
+                        @Html.DropDownListFor(model => model.SecondaryRoom, new SelectList(
+                        bookingModel.SelectedReservationRoomHelper(true, 0),
+                        "key",
+                        "value",
+                        selectedValue: string.IsNullOrEmpty(bookingModel.SelectedReservationRoom.ToString()) ? "Area T" : bookingModel.SelectedReservationRoom.ToString()),
+                        new
+                        {
+                            @id = "SelectedSecondaryReservationRoom"
+                        })
+
+                        @Html.ValidationMessageFor(model => model.SecondaryRoom, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.CostPerStudent, htmlAttributes: new { @class = "control-label col-md-2" })
+
+                    <div class="col-md-10">
+                        @Html.TextBoxFor(model => model.CostPerStudent, new { @class = "form-control col-md-2" })
+                        @Html.ValidationMessageFor(model => model.CostPerStudent, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.MaxAttendees, htmlAttributes: new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.TextBoxFor(model => model.MaxAttendees, new { @class = "form-control col-md-2" })
+                        @Html.ValidationMessageFor(model => model.MaxAttendees, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.ExternalBookingSource, htmlAttributes: new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        <div class="checkbox">
+                            @Html.CheckBoxFor(model => model.ExternalBookingSource, new { })
+                        </div>
+                    </div>
+                </div>
+
+                <div id="BookingLink" class="form-group d-none">
+                    @Html.LabelFor(model => model.ExternalBookingLink, htmlAttributes: new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.TextBoxFor(model => model.ExternalBookingLink, new { @class = "form-control col-md-12" })
+                        @Html.ValidationMessageFor(model => model.ExternalBookingLink, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-10">
+                        <div id="validateButton" class="btn btn-success" onclick="saveBooking()">@(Model.EduClassId == Guid.Empty ? "Create Class" : "Update Class")</div>
+
+                        <div id="deleteButton" class="btn btn-danger @(Model.EduClassId == Guid.Empty ? "d-none" : "d-block")" onclick="deleteClass('@Model.EduClassId')">Delete Class</div>
+
+                        <div id="validation-message" style="color: red"></div>
+                    </div>
+                </div>
+
+
+                <div>
+                    @Html.ActionLink("Back to Dashboard", "Dashboard")
+                </div>
+            </div>
+        </div>
+    }
+
+</div>
+
+<!-- JS, Popper.js, and jQuery -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
+
+<script src="~/Scripts/ManageClasses.js"></script>
+
+<script>
+
+    $(function () {
+        document.getElementById('ExternalBookingSource').addEventListener("click",
+            function () {
+
+                if (!$('#ExternalBookingSource').is(":checked")) {
+                    var field = document.getElementById('ExternalBookingLink');
+                    field.value = '';
+                    toggleVisibility('#BookingLink');
+                }
+                else {
+                    toggleVisibility('#BookingLink');
+                }
+
+            })
+    });
+
+    function checkAvailability(eduClassId) {
+
+        var Resp;
+
+        $.ajax({
+            url: '@Url.Action("CheckEduClassScheduleAvailability", "Home")',
+            data: {
+                "CurrentClassStartTime": $('#datepicker').val(),
+                "CurrentClassEndTime": $('#datepicker2').val(),
+                "MainRoomID": $('#SelectedReservationRoom').val(),
+                "SecondaryRoomID": $('#SelectedSecondaryReservationRoom').val(),
+                "EduClassId": eduClassId
+
+            },
+            cache: false,
+            type: "GET",
+            success: function (response) {
+                $("#validation-message").text(response.ResponseText);
+                Resp = response.IsValid
+            },
+            error: function (response) {
+                $("#validation-message").text('Failed To Check Class Availability. Failure to Communicate. Response: ' +  response.Text);
+            },
+            async: false
+        })
+
+        return Resp;
+    }
+
+    function saveBooking() {
+
+        var EduClassId = $('#EduClassID').val()
+
+        if (EduClassId !== '@Guid.Empty') {
+
+            if (validateForm()) {
+
+                var isAvailable = checkAvailability(EduClassId);
+
+                if (isAvailable === true) {
+                    $.ajax({
+                        url: '@Url.Action("UpdateClass", "Home")',
+                        data: {
+                            "InstructorID": $('#InstructorID').val(),
+                            "EduClassID": EduClassId,
+                            "ClassTitle": $('#ClassTitle').val(),
+                            "StartDateTime": $('#datepicker').val(),
+                            "EndDateTime": $('#datepicker2').val(),
+                            "Description": $('#Description').val(),
+                            "MainRoom": $('#SelectedReservationRoom').val(),
+                            "SecondaryRoom": $('#SelectedSecondaryReservationRoom').val(),
+                            "CostPerStudent": $('#CostPerStudent').val(),
+                            "MaxAttendees": $('#MaxAttendees').val(),
+                            "ExternalBookingSource": $('#ExternalBookingSource:checked').val(),
+                            "ExternalBookingLink": $('#ExternalBookingLink').val()
+                        },
+                        cache: false,
+                        type: "POST",
+                        success: function (response) {
+                            alert('Successfully Updated Class!');
+                            window.location.assign('@Url.Action("Dashboard/")')
+                        },
+                        error: function (response) {
+                            alert('Failed To Update Class. Failure to Communicate.' + response.ResponseText);
+                        }
+                    })
+                } 
+            }
+        } else {
+
+            if (validateForm()) {
+
+                var isAvailable = checkAvailability(null);
+
+                if (isAvailable === true) {
+                    $.ajax({
+                        url: '@Url.Action("CreateNewClass", "Home")',
+                        data: {
+                            "InstructorID": $('#InstructorID').val(),
+                            "ClassTitle": $('#ClassTitle').val(),
+                            "StartDateTime": $('#datepicker').val(),
+                            "EndDateTime": $('#datepicker2').val(),
+                            "Description": $('#Description').val(),
+                            "MainRoom": $('#SelectedReservationRoom').val(),
+                            "SecondaryRoom": $('#SelectedSecondaryReservationRoom').val(),
+                            "CostPerStudent": $('#CostPerStudent').val(),
+                            "MaxAttendees": $('#MaxAttendees').val(),
+                            "ExternalBookingSource": $('#ExternalBookingSource:checked').val(),
+                            "ExternalBookingLink": $('#ExternalBookingLink').val()
+                        },
+                        cache: false,
+                        type: "GET",
+                        success: function (response) {
+                            alert('Successfully Created Class!');
+                            window.location.assign('@Url.Action("Dashboard/")')
+                        },
+                        error: function (response) {
+                            alert('Failed To Create Class. Failure to Communicate.');
+                        }
+                    });
+                }
+            }
+        }
+
+        }
+
+    function deleteClass(eduClassID) {
+        $.ajax({
+            url: '@Url.Action("DeleteClass", "Home")',
+            data: {
+                "EduClassId": eduClassID
+            },
+            cache: false,
+            type: "GET",
+            success: function (response) {
+                alert('Successfully Deleted Class!');
+                window.location.assign('@Url.Action("Dashboard/")')
+            },
+            error: function () {
+                $("#validation-message").text('Failed To Delete Class. Failure to Communicate.');
+            },
+        })
+        }
+
+</script>

@@ -1,0 +1,201 @@
+﻿@using Attanaya_Warrior_Institute.Models
+@model Attanaya_Warrior_Institute.Models.GiftCertificateModel
+
+@{
+    ViewBag.Title = "Gift Certificate";
+}
+
+    <link href="~/Content/GiftCertificate.css" rel="stylesheet" />
+
+    <div style="margin-top: 100px;">
+        <h2 class="special-elite-font">Large Party Packages</h2>
+
+        @using (Html.BeginForm("GetGiftCertificate", "Home", Model))
+        {
+
+            @Html.AntiForgeryToken()
+
+            @Html.Hidden("totalPrice")
+
+            <div class="form-horizontal">
+
+                <hr />
+
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                <div class="form-row" style="margin-bottom: 30px;">
+
+                    <div class="special-elite-font" style="font-size: large">Select a package: </div>
+                    <div class="col-md-10 mb-3">
+                        @Html.DropDownListFor(m => m.PackageType, new SelectList(
+                            Packages.SelectedPackageHelper(),
+                            "key",
+                            "value",
+                            selectedValue: Model.PackageType),
+                            new
+                            {
+                                @id = "SelectedPackageType",
+                                @onchange = "GetPackageObject();",
+                            })
+
+
+                        @Html.ValidationMessageFor(model => model.PackageType, "", new { @class = "text-danger" })
+
+                    </div>
+
+                    <div class="special-elite-font col-md-10" style="font-size: large">Description: </div>
+                    <div id="PackageDescription" class="col-md-5" style="font-size: large; background: rgb(231, 239, 253); min-height: 100px; min-width: 150px; max-width: 80vw; border: black; border-style: ridge; border-width: 1px;">
+                        <!-- Determined by JS -->
+                    </div>
+
+                </div>
+
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                <div class="form-row" style="margin-bottom: 20px;">
+                    <div class="special-elite-font col-md-12" style="font-size: large">Purchaser Information: </div>
+                    <div class="col-md-4">
+                        @Html.LabelFor(model => model.PurchaserFirstName, htmlAttributes: new { @class = "control-label col-md-4" })
+                        @Html.EditorFor(model => model.PurchaserFirstName, new { htmlAttributes = new { @class = "form-control" } })
+                        @Html.ValidationMessageFor(model => model.PurchaserFirstName, "", new { @class = "text-danger" })
+                    </div>
+
+                    <div class="col-md-4">
+                        @Html.LabelFor(model => model.PurchaserMiddleName, htmlAttributes: new { @class = "control-label col-md-4" })
+                        @Html.EditorFor(model => model.PurchaserMiddleName, new { htmlAttributes = new { @class = "form-control" } })
+                        @Html.ValidationMessageFor(model => model.PurchaserMiddleName, "", new { @class = "text-danger" })
+                    </div>
+
+
+                    <div class="col-md-4">
+                        @Html.LabelFor(model => model.PurchaserLastName, htmlAttributes: new { @class = "control-label col-md-4" })
+                        @Html.EditorFor(model => model.PurchaserLastName, new { htmlAttributes = new { @class = "form-control" } })
+                        @Html.ValidationMessageFor(model => model.PurchaserLastName, "", new { @class = "text-danger" })
+                    </div>
+
+
+                    <div class="col-md-6">
+                        @Html.LabelFor(model => model.PurchaserEmailAddress, htmlAttributes: new { @class = "control-label col-md-6" })
+                        @Html.EditorFor(model => model.PurchaserEmailAddress, new { htmlAttributes = new { @class = "form-control" } })
+                        @Html.ValidationMessageFor(model => model.PurchaserEmailAddress, "", new { @class = "text-danger" })
+                    </div>
+
+
+                    <div class="col-md-4">
+                        @Html.LabelFor(model => model.PurchaserPhoneNumber, htmlAttributes: new { @class = "control-label col-md-6" })
+                        @Html.EditorFor(model => model.PurchaserPhoneNumber, new { htmlAttributes = new { @class = "form-control" } })
+                        @Html.ValidationMessageFor(model => model.PurchaserPhoneNumber, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <hr />
+                <div class="special-elite-font" style="font-size: large">Group Leader: </div>
+                <div class="form-row" style="margin-bottom: 20px;">
+                    <div class="col-md-3">
+                        @Html.LabelFor(model => model.RecipientName, htmlAttributes: new { @class = "control-label" })
+                        @Html.EditorFor(model => model.RecipientName, new { htmlAttributes = new { @class = "form-control" } })
+                        @Html.ValidationMessageFor(model => model.RecipientName, "", new { @class = "text-danger" })
+                    </div>
+
+
+                    <div class="col-md-3">
+                        @Html.LabelFor(model => model.RecipientPhone, htmlAttributes: new { @class = "control-label" })
+                        @Html.EditorFor(model => model.RecipientPhone, new { htmlAttributes = new { @class = "form-control" } })
+                        @Html.ValidationMessageFor(model => model.RecipientPhone, "", new { @class = "text-danger" })
+                    </div>
+
+
+                    <div class="col-md-6">
+                        @Html.LabelFor(model => model.RecipientEmail, htmlAttributes: new { @class = "control-label" })
+                        @Html.EditorFor(model => model.RecipientEmail, new { htmlAttributes = new { @class = "form-control" } })
+                        @Html.ValidationMessageFor(model => model.RecipientEmail, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div> <div>Send Recipient Email?</div> <div style="padding-right: 3px;">@Html.CheckBox("SendRecipientEmail")</div> </div>
+
+                @Html.HiddenFor(model => model.GiftCertificateNumber)
+
+                <div class="special-elite-font col-md-12 mt-3" style="font-size: large">Total Price: </div>
+                <div id="TotalPriceBox" class="total-price-box col-md-12">
+
+                </div>
+
+                <div id="validateButton" class="btn btn-outline-success mt-5" onclick="showPaymentOnValidation()" @*onclick="saveGiftCertificate()*@>Purchase Certificate</div>
+                <div id="validation-message" style="color: red"></div>
+
+                <div id="paypal-button-container" class="d-none"> <h3 class="special-elite-font" style="padding-top: 10px; padding-bottom: 20px">Payment Information:</h3></div>
+
+            </div>
+
+        }
+    </div>
+
+    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <!-- Include the PayPal JavaScript SDK -->
+    <script src="https://www.paypal.com/sdk/js?client-id=AVIstvNQ4gyLkuLXXefuqfQt5VHvtVu-WB6Govz2nyqUT1L7TB-Tsku5AOhp5yoEc1jtgHHgXugh-xHw&currency=USD"></script>
+    <script src="~/Scripts/GiftCertificate.js"></script>
+
+    <script>
+
+    function saveGiftCertificate() {
+
+        if (ValidateGiftCertificateForm()) {
+
+            var dataVals = {
+                'PackageType': $("#SelectedPackageType").val(),
+                'PurchaserFirstName': $("#PurchaserFirstName").val(),
+                'PurchaserMiddleName': $("#PurchaserMiddleName").val(),
+                'PurchaserLastName': $("#PurchaserLastName").val(),
+                'PurchaserEmailAddress': $("#PurchaserEmailAddress").val(),
+                'PurchaserPhoneNumber': $("#PurchaserPhoneNumber").val(),
+                'RecipientName': $("#RecipientName").val(),
+                'RecipientPhone': $("#RecipientPhone").val(),
+                'RecipientEmail' : $("#RecipientEmail").val()
+            };
+
+            $.ajax({
+                url: '@Url.Action("GetGiftCertificate", "Home")',
+                cache: false,
+                type: "GET",
+                data: dataVals,
+                success: function (response) {
+                    $('#GiftCertificateNumber').val(response.toString());
+                    pushGiftCertDataToServer('@Url.Action("PackageReceipt", "Home")');
+
+                    if ($('#SendRecipientEmail').checked) {
+                        pushGiftCertDataToServer('@Url.Action("PackageReceipt", "Home")');
+                    };
+                },
+                error: function (xhr) {
+                   //
+                }
+            });
+        }
+    }
+
+    // Render the PayPal button into #paypal-button-container
+    paypal.Buttons({
+
+        // Set up the transaction
+        createOrder: function (data, actions) {
+            return actions.order.create({
+                purchase_units: [{
+                    amount: {
+                        value: $('#totalPrice').val().toString()
+                    },
+                    application_context: {
+                        shipping_preference: 'NO_SHIPPING'
+                    }
+                }]
+            });
+        },
+
+        // Finalize the transaction
+        onApprove: function (data, actions) {
+            return actions.order.capture().then(function (details) {
+                saveGiftCertificate();
+            });
+        }
+
+    }).render('#paypal-button-container');
+
+    GetPackageObject(0);
+    </script>

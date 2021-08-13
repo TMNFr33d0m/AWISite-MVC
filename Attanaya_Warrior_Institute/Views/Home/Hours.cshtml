@@ -1,0 +1,63 @@
+﻿@using Attanaya_Warrior_Institute.Models
+
+@{
+    ViewBag.Title = "Hours";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    List<HoursOfOperation> Hours = HoursOfOperation.GetHoursOfOperation();
+}
+
+<link href="~/Content/hours.css" rel="stylesheet" />
+
+<div id="content-body" class="pt-5 mt-5 forum-font">
+    <div class="mt-3">
+        <h1 class="special-elite-font"> Contact AWI:</h1>
+    </div>
+        <address>
+            <a href="mailto:attanaya@outlook.com">Email Us</a><br>
+            <a href="tel:+15202535270">Call Us: (520) 253-5270</a><br />
+            <br />
+            1802 W Grant Rd. #107<br />
+            Tucson, AZ 85745
+        </address>
+        <div class="small btn-link" onclick="scrollToBottom()"> See map below </div>
+
+    <div class="row justify-content-center">
+        <table class="table table-bordered table-responsive-sm col-lg-3 col-md-4 col-sm-12 m-1">
+            <thead class="special-elite-font fa-2x">
+                <tr>
+                    <td colspan="4">Hours of Operation</td>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var record in Hours)
+                {
+                    <tr>
+                        @if (record.OpenTime.TotalMinutes > 30)
+                        {
+                            <th scope="row">@record.DayOfWeek:</th>
+                            <td><strong>Open:</strong> @record.OpenTime </td>
+                            <td><strong>Close:</strong> @record.CloseTime</td>
+                            <td class="small">Last Reservation By: @record.CloseTime.Subtract(new TimeSpan(0, 1, 30, 0))</td>
+                        }
+                        else
+                        {
+                            <th scope="row">@record.DayOfWeek:</th>
+                            <td colspan="3" class="alert-danger"><strong>Closed</strong></td>
+                        }
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <div class="embed-responsive embed-responsive-16by9 mb-3 col-lg-8 col-md-7 col-sm-12 m-1">
+            <iframe class="embed-responsive-item" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1003.1752218477333!2d-111.00455871372971!3d32.25093020238622!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x86d676addfca32ff%3A0x41e48d6d2df9a16b!2s1802%20W%20Grant%20Rd%2C%20Tucson%2C%20AZ%2085745!5e0!3m2!1sen!2sus!4v1576450717173!5m2!1sen!2sus" width="600" height="450" frameborder="0" style="border: 0;" allowfullscreen=""></iframe>
+        </div>
+    </div>
+</div>  
+
+<script>
+    function scrollToBottom() {
+        window.scrollTo(0, document.querySelector("#content-body").scrollHeight);
+    }
+</script>

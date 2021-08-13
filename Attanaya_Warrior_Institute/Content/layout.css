@@ -1,0 +1,297 @@
+﻿/* Set padding to keep content from hitting the edges */
+.body-content {
+    padding-left: 15px;
+    padding-right: 15px;    
+    min-height: 100vh;
+    margin: 0 auto -155px; /* the bottom margin is the negative value of the footer's height */
+}
+
+.footer, .push {
+    height: 155px; /* .push must be the same height as .footer */
+}
+
+#header{
+    top: 0;
+    width: 100vw;
+    position: fixed;
+    z-index: 9999;
+}
+
+.btn-primary {
+    border-color: #302f2f;
+    background-color: #4f0202;
+}
+
+.btn-primary:hover {
+    background-color: darkred;
+    border-color: #4f0202;
+    font-weight: bold;
+    color: white;
+}
+
+.btn-LEOFlash:hover {
+    -webkit-animation-name: buttonFlash; /* Safari 4.0 - 8.0 */
+    -webkit-animation-duration: 2s; /* Safari 4.0 - 8.0 */
+    animation-name: buttonFlash;
+    animation-duration: 2s;
+    animation-iteration-count: infinite;
+}
+
+/* Safari 4.0 - 8.0 */
+@-webkit-keyframes buttonFlash {
+    0% {
+        background-color: red;
+    }
+
+    5% {
+        background-color: black;
+    }
+
+    10% {
+        background-color: red;
+    }
+
+    15% {
+        background-color: black;
+    }
+
+    25% {
+        background-color: blue;
+    }
+
+    30% {
+        background-color: black;
+    }
+
+    35% {
+        background-color: blue;
+    }
+
+    40% {
+        background-color: black;
+    }
+
+    50% {
+        background-color: red;
+    }
+
+    55% {
+        background-color: black;
+    }
+
+    60% {
+        background-color: red;
+    }
+
+    65% {
+        background-color: black;
+    }
+
+    75% {
+        background-color: blue;
+    }
+
+    80% {
+        background-color: black;
+    }
+
+    85% {
+        background-color: blue;
+    }
+
+    90% {
+        background-color: black;
+    }
+
+    95% {
+        background-color: red;
+    }
+
+    100% {
+        background-color: black;
+    }
+}
+
+/* Standard syntax */
+@keyframes buttonFlash {
+    0% {
+        background-color: red;
+    }
+
+    5% {
+        background-color: black;
+    }
+
+    10% {
+        background-color: red;
+    }
+
+    15% {
+        background-color: black;
+    }
+
+    25% {
+        background-color: blue;
+    }
+
+    30% {
+        background-color: black;
+    }
+
+    35% {
+        background-color: blue;
+    }
+
+    40% {
+        background-color: black;
+    }
+
+    50% {
+        background-color: red;
+    }
+
+    55% {
+        background-color: black;
+    }
+
+    60% {
+        background-color: red;
+    }
+
+    65% {
+        background-color: black;
+    }
+
+    75% {
+        background-color: blue;
+    }
+
+    80% {
+        background-color: black;
+    }
+
+    85% {
+        background-color: blue;
+    }
+
+    90% {
+        background-color: black;
+    }
+
+    95% {
+        background-color: red;
+    }
+
+    100% {
+        background-color: black;
+    }
+}
+
+.btn-civilian:hover {
+    background-image: url('../Images/tea_American_flag.jpg');
+    background-repeat: no-repeat;
+    background-size: 90px 60px;
+    background-position-y: -8px;
+    background-position-x: 0px;
+}
+
+.btn-home:hover {
+    background-image: url('../Images/home.png');
+    background-repeat: no-repeat;
+    background-size: 80px 45px;
+    background-position-y: -4px;
+    background-position-x: -20px;
+}
+
+.btn-about:hover {
+    background-image: url('../Images/bubble.png');
+    background-repeat: no-repeat;
+    background-size: 45px 45px;
+    background-position-y: -10px;
+    background-position-x: 20px;
+}
+
+.btn-login:hover {
+    background-image: url('../Images/key.png');
+    background-repeat: no-repeat;
+    background-size: 80px 45px;
+    background-position-y: -4px;
+    background-position-x: -20px;
+}
+
+.btn-member:hover {
+    background-image: url('../Images/member.png');
+    background-repeat: no-repeat;
+    background-size: 80px 45px;
+    background-position-y: -4px;
+    background-position-x: 30px;
+}
+
+.btn-faq:hover {
+    background-image: url('../Images/faq.png');
+    background-repeat: no-repeat;
+    background-size: 50px 50px;
+    background-position-y: -8px;
+    background-position-x: 0px;
+}
+
+.btn-byog:hover {
+    background-image: url('../Images/gears.png');
+    background-repeat: no-repeat;
+    background-size: 50px 50px;
+    background-position-y: -8px;
+    background-position-x: 0px;
+}
+
+.btn-rules:hover {
+    background-image: url('../Images/rules.png');
+    background-repeat: no-repeat;
+    background-size: 75px 50px;
+    background-position-y: -1px;
+    background-position-x: 0px;
+}
+
+.btn-edu:hover {
+    background-image: url('../Images/edu.png');
+    background-repeat: no-repeat;
+    background-size: 75px 50px;
+    background-position-y: -1px;
+    background-position-x: 0px;
+}
+
+.btn-LEO:hover {
+    background-image: url('../Images/handcuffs.png');
+    background-repeat: no-repeat;
+    background-size: 80px 70px;
+    background-position-y: -18px;
+    background-position-x: 3px;
+}
+
+.btn-partnership:hover {
+    background-image: url('../Images/handshake.png');
+    background-repeat: no-repeat;
+    background-size: 80px 70px;
+    background-position-y: -18px;
+    background-position-x: 50px;
+}
+
+.btn-hours:hover {
+    background-image: url('../Images/time.png');
+    background-repeat: no-repeat;
+    background-size: 80px 70px;
+    background-position-y: -18px;
+    background-position-x: 3px;
+}
+
+.btn-booking:hover {
+    background-image: url('../Images/booking.png');
+    background-repeat: no-repeat;
+    background-size: 80px 70px;
+    background-position-y: -18px;
+    background-position-x: 3px;
+}
+
+.logo-small{
+    height: 60px;
+    width: 60px;
+}

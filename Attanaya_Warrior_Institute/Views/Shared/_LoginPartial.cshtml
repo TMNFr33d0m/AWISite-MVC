@@ -1,0 +1,9 @@
+﻿@if (Request.IsAuthenticated)
+{
+    <button id="dashboard-button" class="btn btn-primary btn-member" onclick="window.location.href = '@Url.Action("Dashboard", "Home")'">Dashboard</button>
+}
+else
+{
+   @Html.ActionLink("Log in", "Login", "Account", routeValues: null, htmlAttributes: new { id = "loginLink", @class = "btn btn-primary btn-login" })
+}
+                                                                                                                                                                   
